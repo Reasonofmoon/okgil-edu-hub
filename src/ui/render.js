@@ -20,6 +20,8 @@ import {
   formatMd,
   countLiteracy,
   lastPeriod,
+  pickClassTimetable,
+  classLabel,
   parseDish,
   allergenNames,
   READING_LOOP,
@@ -161,12 +163,14 @@ export function createHub(options = {}) {
     const range = yearSpan(now, 3, 2);
     state.error = "";
     try {
-      const [schedule, mealsToday, mealsTom, timetable] = await Promise.all([
+      const [schedule, mealsToday, mealsTom, rawTable] = await Promise.all([
         fetchSchedule(school, range, apiOpts()),
         fetchMeals(school, today, apiOpts()).catch(() => []),
         fetchMeals(school, tomorrow, apiOpts()).catch(() => []),
         fetchTimetable(school, today, {}, apiOpts()).catch(() => []),
       ]);
+      const mine = loadStudents().find((s) => s.schoolCode === school.schoolCode);
+      const timetable = pickClassTimetable(rawTable, mine ? { grade: mine.grade, className: mine.className } : {});
       const peers = state.schools.filter((s) => s.area === "okgil").slice(0, 6);
       const window = nearRange(now, 45);
       const peerRows = await Promise.all(peers.map(async (s) => {
@@ -360,7 +364,7 @@ export function createHub(options = {}) {
           ${
             todayEvents.length
               ? `<ul class="okh-list">${todayEvents
-                  .map((e) => `<li><span class="okh-chip is-${tagEvent(e.EVENT_NM)}">${esc(tagEvent(e.EVENT_NM))}</span>${esc(e.EVENT_NM)}</li>`)
+                  .map((e) => `<li><span class="okh-chip is-${tagEvent(e.EVENT_NM)}">${esc({"exam":"시험","off":"방학","event":"행사"}[tagEvent(e.EVENT_NM)] || tagEvent(e.EVENT_NM))}</span>${esc(e.EVENT_NM)}</li>`)
                   .join("")}</ul>`
               : `<p class="okh-empty">오늘 학사 행사가 없습니다.</p>${studyLine("empty", Number(today))}`
           }
@@ -369,7 +373,7 @@ export function createHub(options = {}) {
           <h3>시간표</h3>
           ${
             timetable.length
-              ? `<ul class="okh-list">${timetable
+              ? `${classLabel(timetable) ? `<p class="okh-note">${esc(classLabel(timetable))}</p>` : ""}<ul class="okh-list">${timetable
                   .map((r) => `<li>${esc(r.PERIO)}교시 · ${esc(r.ITRT_CNTNT)}</li>`)
                   .join("")}</ul>
                  ${last ? `<p class="okh-note">마지막 교시 ${esc(last.PERIO)} · 하교 슬롯 후보</p>` : ""}`
