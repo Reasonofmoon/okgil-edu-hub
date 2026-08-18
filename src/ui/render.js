@@ -14,6 +14,8 @@ import {
   yearSpan,
   tagEvent,
   examWeeks,
+  curateWeek,
+  formatMd,
   countLiteracy,
   lastPeriod,
   parseDish,
@@ -27,11 +29,12 @@ import {
 } from "../core/index.js";
 
 const VIEWS = [
-  ["clock", "학교 시계"],
-  ["calendar", "학사 캘린더"],
+  ["briefing", "이번 주"],
+  ["calendar", "달력"],
+  ["clock", "오늘"],
   ["map", "옥길 맵"],
-  ["reading", "독서 루프"],
-  ["gap", "갭 리포트"],
+  ["reading", "독서"],
+  ["gap", "갭"],
   ["students", "원생"],
 ];
 
@@ -57,9 +60,10 @@ export function createHub(options = {}) {
       : OKGIL_SCHOOLS
     ).slice(),
     schoolCode: options.schoolCodes?.[0] || OKGIL_SCHOOLS[0].schoolCode,
-    view: "calendar",
+    view: "briefing",
     theme: options.theme || "light",
     features: {
+      briefing: true,
       clock: true,
       calendar: true,
       meals: true,
@@ -160,6 +164,76 @@ export function createHub(options = {}) {
         )
         .join("")}
     </div>`;
+  }
+
+  function briefCard(kind, kicker, title, body, extra = "") {
+    return `<article class="okh-card okh-brief-card is-${kind}">
+      <h3>${kicker}</h3>
+      <h2>${title}</h2>
+      <p class="okh-empty">${body}</p>
+      ${extra}
+    </article>`;
+  }
+
+  function viewBriefing() {
+    const school = schoolByCode(state.schoolCode, state.schools);
+    const now = state.cache.now || seoulNow();
+    const curated = curateWeek(state.cache.schedule || [], now);
+    const { bounds, exams, examsThisWeek, offs, events } = curated;
+    const dishes = state.cache.mealsToday?.[0] ? parseDish(state.cache.mealsToday[0].DDISH_NM) : [];
+    let mood = "calm";
+    let speech = `${school.name} 이번 주는 잔잔해요. 평소 루틴이면 충분해요.`;
+    if (examsThisWeek.length) {
+      mood = "exam";
+      speech = `이번 주 ${school.name}에 ${examsThisWeek[0].EVENT_NM}이 있어요. 시험 범위는 학교에 물어봐야 해요.`;
+    } else if (exams.length) {
+      mood = "exam";
+      speech = `${formatMd(exams[0].AA_YMD)}에 ${exams[0].EVENT_NM}이 다가와요. 지금부터 리듬만 잡아도 돼요.`;
+    } else if (offs.length) {
+      mood = "off";
+      speech = `이번 주 쉬는 날이 있어요. 책 읽기 좋은 주예요.`;
+    }
+    const weekLabel = `${bounds.monday.getMonth() + 1}월 ${bounds.monday.getDate()}일 – ${bounds.sunday.getMonth() + 1}월 ${bounds.sunday.getDate()}일`;
+    const cards = [];
+    if (exams.length) {
+      const first = exams[0];
+      const when = examsThisWeek.length ? "이번 주" : formatMd(first.AA_YMD);
+      cards.push(briefCard("exam", "시험", `${esc(when)} ${esc(first.EVENT_NM)}`,
+        "시험 범위·준비물은 NEIS에 없습니다. 가정통신문이나 학교에 확인해 주세요.",
+        exams.length > 1 ? `<ul class="okh-list">${exams.slice(0, 4).map((e) => `<li>${esc(formatMd(e.AA_YMD))} · ${esc(e.EVENT_NM)}</li>`).join("")}</ul>` : ""));
+    } else {
+      cards.push(briefCard("calm", "시험", "이번 주 시험 없음", "가까운 2주 안에도 고사·평가가 보이지 않아요."));
+    }
+    if (offs.length) {
+      cards.push(briefCard("off", "방학·휴업",
+        offs.length === 1 ? `${esc(formatMd(offs[0].AA_YMD))} ${esc(offs[0].EVENT_NM)}` : `쉬는 날 ${offs.length}일`,
+        "학원 등원 여부를 미리 맞춰 두세요.",
+        `<ul class="okh-list">${offs.slice(0, 4).map((e) => `<li>${esc(formatMd(e.AA_YMD))} · ${esc(e.EVENT_NM)}</li>`).join("")}</ul>`));
+    }
+    if (events.length) {
+      cards.push(briefCard("event", "이번 주 일정", `${events.length}가지`,
+        "시험·방학이 아닌 행사만 추렸어요.",
+        `<ul class="okh-list">${events.slice(0, 5).map((e) => `<li>${esc(formatMd(e.AA_YMD))} · ${esc(e.EVENT_NM)}</li>`).join("")}</ul>`));
+    } else if (!examsThisWeek.length && !offs.length) {
+      cards.push(briefCard("calm", "일정", "특별한 학사 없음", "이번 주는 평소 수업으로 보여요."));
+    }
+    if (dishes.length) {
+      const names = dishes.map((d) => d.replace(/\(\d.*$/, "")).filter(Boolean);
+      cards.push(briefCard("meal", "오늘 급식", esc(names[0] || "급식"), esc(names.join(" · "))));
+    } else {
+      cards.push(briefCard("meal", "오늘 급식", "식단 없음", "오늘 급식이 없어요. 방학이거나 아직 올라오지 않은 날이에요."));
+    }
+    return `
+      <section class="okh-hero is-${mood}">
+        <img class="okh-mascot" src="/demo/assets/ridi.png" alt="리디" width="160" height="107" />
+        <div class="okh-speech">
+          <p class="okh-speech-name">리디 · ${esc(school.name)}</p>
+          <p>${esc(speech)}</p>
+          <p class="okh-note">${esc(weekLabel)}</p>
+        </div>
+      </section>
+      <div class="okh-grid okh-cols-2 okh-brief">${cards.join("")}</div>
+      <p class="okh-brief-more"><button type="button" class="okh-btn ghost" data-view="calendar">달력에서 더 보기</button></p>`;
   }
 
   function viewClock() {
@@ -404,6 +478,7 @@ export function createHub(options = {}) {
   }
 
   const views = {
+    briefing: viewBriefing,
     clock: viewClock,
     calendar: viewCalendar,
     map: viewMap,
@@ -418,7 +493,7 @@ export function createHub(options = {}) {
       renderBar() +
       renderTabs() +
       `<div class="okh-body">${state.error ? `<p class="okh-empty">NEIS: ${esc(state.error)}</p>` : ""}${views[state.view]()}</div>` +
-      `<div class="okh-foot">모듈 @leadmaster/okgil-edu-hub · 출처 NEIS · ${esc(school.schoolCode)}${state.manifest ? ` · 경기 ${state.manifest.counts.schoolsJ10}교 · 부천 ${state.manifest.counts.schoolsBucheon}교 · 학원 ${state.manifest.counts.academiesBucheon}` : ""}</div>`;
+      `<div class="okh-foot">리드마스터 · 출처 NEIS · ${esc(school.name)}</div>`;
 
     root.querySelector("[data-okh=school]")?.addEventListener("change", async (e) => {
       state.schoolCode = e.target.value;

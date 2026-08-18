@@ -6,10 +6,10 @@
     <title>리드마스터 학원 OS · 옥길 허브 모듈</title>
     <style id="okh-host-css">
 *, *::before, *::after { box-sizing: border-box; }
-html, body { margin: 0; background: #e8e2d6; color: #1c1914; font-family: Pretendard, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+html, body { margin: 0; background: #f3e8dc; color: #2a221c; font-family: Pretendard, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
 .host-bar {
   display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
-  padding: 12px 20px; background: #1f4d43; color: #f4efe6;
+  padding: 14px 22px; background: #3d6b5e; color: #fff8ee;
 }
 .host-bar span { opacity: .75; margin-left: 10px; font-size: 13px; }
 .host-bar nav span { margin-left: 16px; opacity: .55; }
@@ -42,24 +42,27 @@ main {
     </style>
     <style id="okh-module-css">
 .okh-root {
-  --okh-bg: #f4efe6;
-  --okh-paper: #fffdf8;
-  --okh-ink: #1c1914;
-  --okh-mute: #6b6458;
-  --okh-line: #ddd4c4;
-  --okh-pine: #1f4d43;
-  --okh-pine-2: #2d6a5c;
-  --okh-exam: #8a2f1d;
-  --okh-off: #6b6458;
-  --okh-chip: #ece4d4;
+  --okh-bg: #f7efe4;
+  --okh-paper: #fffaf3;
+  --okh-ink: #2a221c;
+  --okh-mute: #7a6d62;
+  --okh-line: #ead9c8;
+  --okh-pine: #3d6b5e;
+  --okh-pine-2: #4f8576;
+  --okh-exam: #b45a45;
+  --okh-off: #7a6d62;
+  --okh-chip: #f3e6d6;
+  --okh-blush: #f6d9cf;
+  --okh-cream: #fff4e6;
   font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
   color: var(--okh-ink);
-  background: var(--okh-bg);
+  background: linear-gradient(180deg, #fff8ee 0%, var(--okh-bg) 220px);
   max-width: 1080px;
   margin: 0 auto;
   border: 1px solid var(--okh-line);
-  border-radius: 16px;
+  border-radius: 22px;
   overflow: hidden;
+  box-shadow: 0 18px 40px rgba(80, 48, 28, 0.08);
   box-sizing: border-box;
 }
 .okh-root *, .okh-root *::before, .okh-root *::after { box-sizing: border-box; }
@@ -179,6 +182,74 @@ main {
 .okh-day.is-today { outline: 2px solid var(--okh-pine); }
 .okh-month-list { max-height: 240px; overflow: auto; }
 
+.okh-hero {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 4px 18px;
+}
+.okh-mascot {
+  width: 112px;
+  height: 112px;
+  object-fit: cover;
+  object-position: 50% 28%;
+  border-radius: 50%;
+  background: var(--okh-cream);
+  border: 3px solid #fff;
+  box-shadow: 0 8px 20px rgba(80, 48, 28, 0.12);
+  flex: 0 0 auto;
+}
+.okh-speech {
+  position: relative;
+  background: var(--okh-paper);
+  border: 1px solid var(--okh-line);
+  border-radius: 18px;
+  padding: 14px 16px 12px;
+  flex: 1;
+  box-shadow: 0 8px 24px rgba(80, 48, 28, 0.05);
+}
+.okh-speech::before {
+  content: "";
+  position: absolute;
+  left: -8px;
+  top: 36px;
+  width: 14px;
+  height: 14px;
+  background: var(--okh-paper);
+  border-left: 1px solid var(--okh-line);
+  border-bottom: 1px solid var(--okh-line);
+  transform: rotate(45deg);
+}
+.okh-speech-name {
+  margin: 0 0 6px;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--okh-pine);
+  font-weight: 700;
+}
+.okh-speech p { margin: 0; line-height: 1.55; font-size: 16px; }
+.okh-hero.is-exam .okh-speech { border-color: #f0c8bc; background: #fff6f2; }
+.okh-hero.is-off .okh-speech { background: #f6f3ee; }
+.okh-brief { margin-top: 4px; }
+.okh-brief-card { min-height: 140px; transition: transform .15s ease; }
+.okh-brief-card.is-exam { border-color: #efc4b6; background: linear-gradient(180deg, #fff7f3, var(--okh-paper)); }
+.okh-brief-card.is-off { background: linear-gradient(180deg, #f7f3ee, var(--okh-paper)); }
+.okh-brief-card.is-meal { background: linear-gradient(180deg, #fff8e8, var(--okh-paper)); }
+.okh-brief-card.is-calm { background: var(--okh-paper); }
+.okh-brief-more { margin: 16px 0 0; text-align: center; }
+.okh-card {
+  box-shadow: 0 6px 18px rgba(80, 48, 28, 0.04);
+}
+.okh-tabs { padding: 12px 16px 0; }
+.okh-tab { font-size: 14px; padding: 8px 12px; }
+.okh-bar { padding: 16px 18px 14px; background: transparent; border-bottom: 0; }
+.okh-brand { font-size: 18px; }
+@media (max-width: 640px) {
+  .okh-hero { flex-direction: column; text-align: center; }
+  .okh-speech::before { display: none; }
+  .okh-mascot { width: 96px; height: 96px; }
+}
+
     </style>
   </head>
   <body>
@@ -198,6 +269,6 @@ main {
         <div id="okgil-slot"></div>
       </section>
     </main>
-    <script type="module" src="/demo/main.js?v=5"></script>
+    <script type="module" src="/demo/main.js?v=6"></script>
   </body>
 </html>
