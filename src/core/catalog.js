@@ -1,3 +1,22 @@
+export const NEAR_DONGS = [
+  { re: /옥길/, rank: 0, label: "옥길동" },
+  { re: /범박동/, rank: 1, label: "범박동" },
+  { re: /소사본동/, rank: 2, label: "소사본동" },
+  { re: /괴안동/, rank: 3, label: "괴안동" },
+  { re: /항동/, rank: 4, label: "항동" },
+];
+
+export function dongRank(text = "") {
+  for (const d of NEAR_DONGS) {
+    if (d.re.test(text)) return d.rank;
+  }
+  return 80;
+}
+
+export function isNearOkgil(text = "") {
+  return dongRank(text) < 80;
+}
+
 export function mapSchool(row) {
   const kind = row.SCHUL_KND_SC_NM || "";
   const blob = `${row.SCHUL_NM || ""} ${row.ORG_RDNMA || ""} ${row.ORG_RDNDA || ""}`;
@@ -15,7 +34,7 @@ export function mapSchool(row) {
     homepage: row.HMPG_ADRES || "",
     founded: row.FOND_YMD,
     highType: row.HS_SC_NM,
-    area: /옥길/.test(blob) ? "okgil" : "bucheon",
+    area: isNearOkgil(blob) ? "okgil" : "bucheon",
     endpoint: kind.includes("고등") ? "hisTimetable" : kind.includes("중학") ? "misTimetable" : "elsTimetable",
   };
 }
@@ -23,6 +42,7 @@ export function mapSchool(row) {
 export function mapAcademy(row) {
   const addr = `${row.FA_RDNMA || ""} ${row.FA_RDNDA || ""}`.replace(/\s+/g, " ").trim();
   const name = row.ACA_NM || "";
+  const blob = `${addr} ${name}`;
   return {
     id: row.ACA_ASNUM,
     name,
@@ -32,7 +52,7 @@ export function mapAcademy(row) {
     status: row.REG_STTUS_NM || "",
     address: addr,
     tel: row.FA_TELNO || "",
-    area: /옥길/.test(`${addr} ${name}`) ? "okgil" : "bucheon",
+    area: isNearOkgil(blob) ? "okgil" : "bucheon",
     isLeadmaster: name === "리드마스터보습학원",
   };
 }

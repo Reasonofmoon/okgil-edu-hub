@@ -2,6 +2,8 @@ import {
   OKGIL_SCHOOLS,
   ACADEMY_POIS,
   loadCatalog,
+  dongRank,
+  isNearOkgil,
   schoolByCode,
   fetchSchedule,
   fetchMeals,
@@ -381,15 +383,17 @@ export function createHub(options = {}) {
   }
 
   function viewMap() {
-    const schools = state.schools.filter((s) => s.area === "okgil" || /옥길/.test(s.name + (s.address || "")));
+    const schools = state.schools
+      .filter((s) => isNearOkgil(`${s.name} ${s.address || ""} ${s.detail || ""}`) || s.area === "okgil")
+      .sort((a, b) => dongRank(`${a.address} ${a.name}`) - dongRank(`${b.address} ${b.name}`) || a.name.localeCompare(b.name, "ko"));
     let list = state.academies.slice();
-    if (state.mapArea === "okgil") list = list.filter((a) => a.area === "okgil" || a.isLeadmaster);
+    if (state.mapArea === "okgil") list = list.filter((a) => a.area === "okgil" || a.isLeadmaster || isNearOkgil(`${a.address} ${a.name}`));
     if (state.mapRealm) list = list.filter((a) => (a.realm || "").includes(state.mapRealm) || (a.course || "").includes(state.mapRealm));
     if (state.mapQ) {
       const q = state.mapQ.toLowerCase();
       list = list.filter((a) => `${a.name} ${a.address}`.toLowerCase().includes(q));
     }
-    list.sort((a, b) => Number(b.isLeadmaster) - Number(a.isLeadmaster) || a.name.localeCompare(b.name, "ko"));
+    list.sort((a, b) => Number(b.isLeadmaster) - Number(a.isLeadmaster) || dongRank(`${a.address} ${a.name}`) - dongRank(`${b.address} ${b.name}`) || a.name.localeCompare(b.name, "ko"));
     const shown = list.slice(0, 60);
     const chip = (key, val, label) => `<button type="button" class="okh-tab okh-abbr" data-map="${key}:${val}" aria-selected="${state[key] === val}">${label}</button>`;
     return `<div class="okh-grid okh-cols-2">
