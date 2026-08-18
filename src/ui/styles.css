@@ -1,0 +1,125 @@
+.okh-root {
+  --okh-bg: #f4efe6;
+  --okh-paper: #fffdf8;
+  --okh-ink: #1c1914;
+  --okh-mute: #6b6458;
+  --okh-line: #ddd4c4;
+  --okh-pine: #1f4d43;
+  --okh-pine-2: #2d6a5c;
+  --okh-exam: #8a2f1d;
+  --okh-off: #6b6458;
+  --okh-chip: #ece4d4;
+  font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  color: var(--okh-ink);
+  background: var(--okh-bg);
+  max-width: 1080px;
+  margin: 0 auto;
+  border: 1px solid var(--okh-line);
+  border-radius: 16px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+.okh-root *, .okh-root *::before, .okh-root *::after { box-sizing: border-box; }
+.okh-root[data-theme="dark"] {
+  --okh-bg: #1a1916;
+  --okh-paper: #24221d;
+  --okh-ink: #f3eee4;
+  --okh-mute: #b2a894;
+  --okh-line: #3a362d;
+  --okh-chip: #322e26;
+}
+.okh-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: var(--okh-paper);
+  border-bottom: 1px solid var(--okh-line);
+  flex-wrap: wrap;
+}
+.okh-brand { font-weight: 700; letter-spacing: -0.03em; }
+.okh-brand small { display: block; font-weight: 400; color: var(--okh-mute); font-size: 12px; margin-top: 2px; }
+.okh-select {
+  border: 1px solid var(--okh-line);
+  background: var(--okh-bg);
+  color: var(--okh-ink);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font: inherit;
+}
+.okh-tabs { display: flex; gap: 6px; flex-wrap: wrap; padding: 10px 16px 0; }
+.okh-tab {
+  border: 0;
+  background: transparent;
+  color: var(--okh-mute);
+  padding: 8px 10px;
+  border-radius: 999px;
+  font: inherit;
+  cursor: pointer;
+}
+.okh-tab[aria-selected="true"] { background: var(--okh-pine); color: #f7f3ea; }
+.okh-body { padding: 16px; min-height: 320px; }
+.okh-grid { display: grid; gap: 12px; }
+@media (min-width: 720px) {
+  .okh-cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .okh-cols-2 { grid-template-columns: 1fr 1fr; }
+}
+.okh-card {
+  background: var(--okh-paper);
+  border: 1px solid var(--okh-line);
+  border-radius: 14px;
+  padding: 14px;
+}
+.okh-card h3 { margin: 0 0 8px; font-size: 14px; color: var(--okh-mute); font-weight: 600; }
+.okh-card h2 { margin: 0 0 10px; font-size: 20px; letter-spacing: -0.03em; }
+.okh-empty { color: var(--okh-mute); font-size: 14px; line-height: 1.5; }
+.okh-list { margin: 0; padding: 0; list-style: none; }
+.okh-list li { padding: 8px 0; border-top: 1px solid var(--okh-line); font-size: 14px; }
+.okh-list li:first-child { border-top: 0; }
+.okh-chip {
+  display: inline-block;
+  background: var(--okh-chip);
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 11px;
+  margin-right: 6px;
+}
+.okh-chip.is-exam { background: #f3d6ce; color: var(--okh-exam); }
+.okh-chip.is-off { background: var(--okh-chip); }
+.okh-cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.okh-cal .okh-dow { text-align: center; font-size: 11px; color: var(--okh-mute); padding: 4px 0; }
+.okh-day {
+  min-height: 64px;
+  border: 1px solid var(--okh-line);
+  border-radius: 8px;
+  padding: 6px;
+  background: var(--okh-paper);
+  font-size: 12px;
+}
+.okh-day strong { display: block; }
+.okh-day.is-off { opacity: 0.55; }
+.okh-day.is-exam { border-color: var(--okh-exam); }
+.okh-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: end; }
+.okh-form label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--okh-mute); }
+.okh-form input, .okh-form select {
+  border: 1px solid var(--okh-line);
+  background: var(--okh-bg);
+  color: var(--okh-ink);
+  border-radius: 8px;
+  padding: 7px 8px;
+  font: inherit;
+}
+.okh-btn {
+  background: var(--okh-pine);
+  color: #f7f3ea;
+  border: 0;
+  border-radius: 10px;
+  padding: 9px 12px;
+  font: inherit;
+  cursor: pointer;
+}
+.okh-btn.ghost { background: transparent; color: var(--okh-ink); border: 1px solid var(--okh-line); }
+.okh-note { font-size: 12px; color: var(--okh-mute); margin-top: 8px; }
+.okh-poi { display: flex; justify-content: space-between; gap: 8px; }
+.okh-foot { padding: 10px 16px 14px; font-size: 11px; color: var(--okh-mute); }

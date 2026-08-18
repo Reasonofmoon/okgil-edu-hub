@@ -1,0 +1,34 @@
+{
+  "name": "@leadmaster/okgil-edu-hub",
+  "version": "0.1.0",
+  "description": "옥길 교육정보 허브 모듈. 다른 앱에 mount로 붙입니다.",
+  "type": "module",
+  "main": "src/index.js",
+  "module": "src/index.js",
+  "types": "src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js",
+      "default": "./src/index.js"
+    },
+    "./core": {
+      "types": "./src/core/index.d.ts",
+      "import": "./src/core/index.js"
+    },
+    "./styles.css": "./src/ui/styles.css"
+  },
+  "files": ["src", "README.md"],
+  "scripts": {
+    "demo": "node demo/proxy.mjs",
+    "start": "node demo/proxy.mjs"
+  },
+  "keywords": ["okgil", "neis", "education", "embed", "leadmaster"],
+  "license": "UNLICENSED",
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "react": { "optional": true }
+  }
+}

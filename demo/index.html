@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>리드마스터 학원 OS · 옥길 허브 모듈</title>
+    <link rel="stylesheet" href="/demo/host.css" />
+  </head>
+  <body>
+    <header class="host-bar">
+      <div>
+        <strong>리드마스터 학원 OS</strong>
+        <span>호스트 앱 · 아래 슬롯에 허브 모듈을 붙였습니다</span>
+      </div>
+      <nav>
+        <span class="on">교육허브</span>
+        <span>상담</span>
+        <span>출결</span>
+      </nav>
+    </header>
+    <main>
+      <aside class="host-side">
+        <p>이 페이지는 호스트입니다. 모듈은 <code>#okgil-slot</code>에만 마운트됩니다.</p>
+        <pre id="host-events"></pre>
+      </aside>
+      <section>
+        <div id="okgil-slot"></div>
+      </section>
+    </main>
+    <script type="module" src="/demo/main.js"></script>
+  </body>
+</html>
