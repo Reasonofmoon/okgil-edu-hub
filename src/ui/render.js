@@ -28,6 +28,15 @@ import {
   removeStudent,
   loadChecks,
   saveChecks,
+  upcomingSchoolExams,
+  upcomingNational,
+  matchNational,
+  isHighSchool,
+  tipForDays,
+  ddayLabel,
+  nearRange,
+  pickQuote,
+  QUOTE_CUTTER,
 } from "../core/index.js";
 
 const VIEWS = [
@@ -98,6 +107,7 @@ export function createHub(options = {}) {
       mealsToday: [],
       mealsTom: [],
       timetable: [],
+      schoolExams: [],
       now: seoulNow(),
       today: formatYmd(seoulNow()),
     },
@@ -139,7 +149,18 @@ export function createHub(options = {}) {
         fetchMeals(school, tomorrow, apiOpts()).catch(() => []),
         fetchTimetable(school, today, {}, apiOpts()).catch(() => []),
       ]);
-      state.cache = { schedule, mealsToday, mealsTom, timetable, today, tomorrow, range, now };
+      const peers = state.schools.filter((s) => s.area === "okgil").slice(0, 6);
+      const window = nearRange(now, 45);
+      const peerRows = await Promise.all(peers.map(async (s) => {
+        if (s.schoolCode === school.schoolCode) return { school: s, rows: schedule };
+        const rows = await fetchSchedule(s, window, apiOpts()).catch(() => []);
+        return { school: s, rows };
+      }));
+      const schoolExams = peerRows.map(({ school: s, rows }) => {
+        const next = upcomingSchoolExams(rows, now, 30)[0] || null;
+        return { school: s, next };
+      });
+      state.cache = { schedule, mealsToday, mealsTom, timetable, today, tomorrow, range, now, schoolExams };
       const weeks = examWeeks(schedule);
       if (weeks[0]) {
         emit({
@@ -151,7 +172,7 @@ export function createHub(options = {}) {
       }
     } catch (e) {
       state.error = e.message || String(e);
-      state.cache = { schedule: [], mealsToday: [], mealsTom: [], timetable: [], today, tomorrow, range, now };
+      state.cache = { schedule: [], mealsToday: [], mealsTom: [], timetable: [], today, tomorrow, range, now, schoolExams: [] };
     }
   }
 
@@ -243,7 +264,18 @@ export function createHub(options = {}) {
     } else {
       cards.push(briefCard("meal", "오늘 급식", "식단 없음", "오늘 급식이 없어요. 방학이거나 아직 올라오지 않은 날이에요."));
     }
+    const q = pickQuote(now.getTime());
+    const high = isHighSchool(school);
+    const national = upcomingNational(now, high);
+    const schoolSoon = upcomingSchoolExams(state.cache.schedule || [], now, 30);
+    const focus = schoolSoon[0] || (national[0] ? { EVENT_NM: national[0].name, AA_YMD: national[0].ymd, days: national[0].days, national: national[0] } : null);
+    const tip = focus ? tipForDays(focus.days) : null;
+    const peer = state.cache.schoolExams || [];
     return `
+      <aside class="okh-quote" data-okh="quote">
+        <p class="okh-quote-text">“${esc(q.text)}”</p>
+        <p class="okh-quote-by">${esc(q.by)} · <a href="${QUOTE_CUTTER}" target="_blank" rel="noopener">Quote Cutter</a></p>
+      </aside>
       <section class="okh-hero is-${mood}">
         <img class="okh-mascot" src="/demo/assets/ridi.png" alt="리디" width="160" height="107" />
         <div class="okh-speech">
@@ -252,6 +284,32 @@ export function createHub(options = {}) {
           <p class="okh-note">${esc(weekLabel)}</p>
         </div>
       </section>
+      ${peer.length ? `<div class="okh-dday-row">${peer.map((p) => {
+        const n = p.next;
+        const d = n ? ddayLabel(n.days) : "일정 없음";
+        const title = n ? n.EVENT_NM : "한 달 안 시험 없음";
+        const hit = n ? matchNational(n.AA_YMD) : null;
+        return `<button type="button" class="okh-dday ${n ? "is-on" : ""}" data-okh-school="${p.school.schoolCode}" title="${esc(title)}">
+          <strong>${esc(p.school.name.replace(/등학교|등학교/, "").replace("학교", ""))}</strong>
+          <span>${esc(d)}</span>
+          ${hit ? `<em>평가원·학평</em>` : ""}
+        </button>`;
+      }).join("")}</div>` : ""}
+      ${focus && tip ? `<article class="okh-card okh-tip">
+        <h3>${esc(ddayLabel(focus.days))} · ${esc(focus.EVENT_NM || "")}</h3>
+        <h2>${esc(tip.title)}</h2>
+        <p class="okh-empty">${esc(tip.body)}</p>
+        <p class="okh-note">참고 ${tip.refs.map((ref) => `<a href="${ref.href}" target="_blank" rel="noopener">${esc(ref.label)}</a>`).join(" · ")}</p>
+        ${focus.national ? `<p class="okh-note">출처 ${focus.national.tentative ? "교육청 학평 일정(안), 학교 학사와 다를 수 있음" : "한국교육과정평가원"} ${focus.national.source ? `· <a href="${focus.national.source}" target="_blank" rel="noopener">공고</a>` : ""}</p>` : ""}
+      </article>` : ""}
+      ${national.length ? `<article class="okh-card">
+        <h3>2026 공개 입시 일정</h3>
+        <ul class="okh-list">${national.slice(0, 4).map((e) => {
+          const aligned = (state.cache.schedule || []).some((r) => r.AA_YMD === e.ymd && /모의|학력|수능/.test(r.EVENT_NM || ""));
+          return `<li><span class="okh-chip is-exam">${esc(ddayLabel(e.days))}</span>${esc(formatMd(e.ymd))} · ${esc(e.name)} · ${esc(e.host)}${aligned ? " · 이 학교 학사와 같음" : ""}${e.tentative ? " · 일정안" : ""}</li>`;
+        }).join("")}</ul>
+        <p class="okh-note">수능·6월·9월 모평은 <a href="https://www.suneung.re.kr/main.do" target="_blank" rel="noopener">평가원</a> 공고. 학평은 교육청 일정안입니다.</p>
+      </article>` : ""}
       <div class="okh-grid okh-cols-2 okh-brief">${cards.join("")}</div>
       <p class="okh-brief-more"><button type="button" class="okh-btn ghost" data-view="calendar">달력 보기</button></p>`;
   }
@@ -519,6 +577,15 @@ export function createHub(options = {}) {
       `<div class="okh-body">${state.error ? `<p class="okh-empty">NEIS: ${esc(state.error)}</p>` : ""}${views[state.view]()}</div>` +
       `<div class="okh-foot">리드마스터 · 출처 NEIS · ${esc(school.name)}</div>`;
 
+    root.querySelectorAll("[data-okh-school]").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        state.schoolCode = btn.getAttribute("data-okh-school");
+        const s = schoolByCode(state.schoolCode, state.schools);
+        emit({ type: "school.selected", schoolCode: s.schoolCode, schoolName: s.name });
+        await loadSchoolData();
+        paint();
+      });
+    });
     root.querySelector("[data-okh=school]")?.addEventListener("change", async (e) => {
       state.schoolCode = e.target.value;
       const s = schoolByCode(state.schoolCode, state.schools);
@@ -617,7 +684,15 @@ export function createHub(options = {}) {
     paint();
     const s = schoolByCode(state.schoolCode, state.schools);
     emit({ type: "school.selected", schoolCode: s.schoolCode, schoolName: s.name });
+    if (!state._quoteTimer) {
+      state._quoteTimer = setInterval(() => {
+        const box = root.querySelector("[data-okh=quote]");
+        if (!box) return;
+        const q = pickQuote(Date.now());
+        box.innerHTML = `<p class="okh-quote-text">“${esc(q.text)}”</p><p class="okh-quote-by">${esc(q.by)} · <a href="${QUOTE_CUTTER}" target="_blank" rel="noopener">Quote Cutter</a></p>`;
+      }, 14000);
+    }
   }
 
-  return { root, start, unmount() { root.remove(); } };
+  return { root, start, unmount() { if (state._quoteTimer) clearInterval(state._quoteTimer); root.remove(); } };
 }

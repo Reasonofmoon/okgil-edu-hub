@@ -278,6 +278,36 @@ main {
 .okh-chip.is-lang { background: #dde8f5; color: #2c4d7a; }
 .okh-chip.is-etc { background: var(--okh-chip); color: var(--okh-mute); }
 
+.okh-quote {
+  background: var(--okh-paper);
+  border: 1px solid var(--okh-line);
+  border-radius: 16px;
+  padding: 14px 16px 12px;
+  margin-bottom: 14px;
+  box-shadow: 0 8px 20px rgba(80, 48, 28, 0.05);
+}
+.okh-quote-text { margin: 0 0 6px; font-size: 16px; line-height: 1.55; letter-spacing: -0.02em; }
+.okh-quote-by { margin: 0; font-size: 12px; color: var(--okh-mute); }
+.okh-quote-by a { color: var(--okh-pine); }
+.okh-dday-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 14px; }
+.okh-dday {
+  border: 1px solid var(--okh-line);
+  background: var(--okh-paper);
+  border-radius: 14px;
+  padding: 8px 10px;
+  min-width: 88px;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+.okh-dday strong { display: block; font-size: 12px; color: var(--okh-mute); }
+.okh-dday span { font-weight: 800; color: var(--okh-pine); }
+.okh-dday.is-on { border-color: #efc4b6; background: #fff7f3; }
+.okh-dday.is-on span { color: var(--okh-exam); }
+.okh-dday em { display: block; font-style: normal; font-size: 10px; color: var(--okh-exam); }
+.okh-tip { margin-bottom: 12px; }
+.okh-tip a { color: var(--okh-pine); }
+
     </style>
   </head>
   <body>
@@ -297,6 +327,6 @@ main {
         <div id="okgil-slot"></div>
       </section>
     </main>
-    <script type="module" src="/demo/main.js?v=9"></script>
+    <script type="module" src="/demo/main.js?v=10"></script>
   </body>
 </html>

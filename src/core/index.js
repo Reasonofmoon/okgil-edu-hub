@@ -6,3 +6,5 @@ export * from "./timetable.js";
 export * from "./meals.js";
 export * from "./books.js";
 export * from "./storage.js";
+export * from "./exams.js";
+export * from "./quotes.js";
