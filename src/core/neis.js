@@ -77,12 +77,13 @@ export async function fetchSchoolInfo(options = {}) {
 }
 
 export async function fetchSchedule(school, range, options = {}) {
-  return neisGet("SchoolSchedule", {
+  return neisGetAll("SchoolSchedule", {
     ATPT_OFCDC_SC_CODE: school.officeCode,
     SD_SCHUL_CODE: school.schoolCode,
     AA_FROM_YMD: range.from,
     AA_TO_YMD: range.to,
-  }, options);
+    pSize: 100,
+  }, { ...options, sleepMs: 80 });
 }
 
 export async function fetchMeals(school, dateYmd, options = {}) {

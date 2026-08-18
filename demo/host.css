@@ -29,3 +29,5 @@ main {
 .host-events li:first-child { border-top: 0; }
 .host-events .t { color: #8a8274; margin-right: 8px; }
 .host-events .k { font-weight: 600; margin-right: 8px; }
+
+.host-side { display: none; }

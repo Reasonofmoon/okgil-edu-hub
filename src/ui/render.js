@@ -11,6 +11,7 @@ import {
   formatKoDate,
   parseYmd,
   monthRange,
+  yearSpan,
   tagEvent,
   examWeeks,
   countLiteracy,
@@ -56,7 +57,7 @@ export function createHub(options = {}) {
       : OKGIL_SCHOOLS
     ).slice(),
     schoolCode: options.schoolCodes?.[0] || OKGIL_SCHOOLS[0].schoolCode,
-    view: "clock",
+    view: "calendar",
     theme: options.theme || "light",
     features: {
       clock: true,
@@ -84,6 +85,8 @@ export function createHub(options = {}) {
     mapArea: "okgil",
     mapRealm: "",
     mapQ: "",
+    calYear: seoulNow().getFullYear(),
+    calMonth: seoulNow().getMonth() + 1,
     error: "",
   };
 
@@ -103,7 +106,7 @@ export function createHub(options = {}) {
     const now = seoulNow();
     const today = formatYmd(now);
     const tomorrow = formatYmd(new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1));
-    const range = monthRange(now.getFullYear(), now.getMonth() + 1);
+    const range = yearSpan(now, 3, 2);
     state.error = "";
     try {
       const [schedule, mealsToday, mealsTom, timetable] = await Promise.all([
@@ -226,35 +229,62 @@ export function createHub(options = {}) {
   }
 
   function viewCalendar() {
-    const { schedule = [], now } = state.cache;
-    const y = now.getFullYear();
-    const m = now.getMonth() + 1;
+    const now = state.cache.now || seoulNow();
+    const today = state.cache.today || formatYmd(now);
+    const y = state.calYear || now.getFullYear();
+    const m = state.calMonth || now.getMonth() + 1;
+    const schedule = state.cache.schedule || [];
+    const prefix = `${y}${String(m).padStart(2, "0")}`;
+    const monthRows = schedule.filter((r) => String(r.AA_YMD || "").startsWith(prefix));
     const first = new Date(y, m - 1, 1);
     const startPad = first.getDay();
     const days = new Date(y, m, 0).getDate();
     const byDay = {};
-    for (const r of schedule) {
-      const dd = Number(r.AA_YMD.slice(6));
+    for (const r of monthRows) {
+      const dd = Number(String(r.AA_YMD).slice(6));
       (byDay[dd] ||= []).push(r);
     }
     let cells = "";
     for (let i = 0; i < startPad; i++) cells += `<div></div>`;
     for (let d = 1; d <= days; d++) {
       const ev = byDay[d] || [];
+      const ymd = `${prefix}${String(d).padStart(2, "0")}`;
       const kinds = ev.map((e) => tagEvent(e.EVENT_NM));
-      const cls = kinds.includes("exam") ? "is-exam" : kinds.includes("off") ? "is-off" : "";
+      const cls = [
+        kinds.includes("exam") ? "is-exam" : "",
+        kinds.includes("off") ? "is-off" : "",
+        ymd === today ? "is-today" : "",
+      ].filter(Boolean).join(" ");
       cells += `<div class="okh-day ${cls}"><strong>${d}</strong>${ev
-        .slice(0, 2)
+        .slice(0, 3)
         .map((e) => `<div>${esc(e.EVENT_NM)}</div>`)
         .join("")}</div>`;
     }
+    const years = [];
+    for (let yy = now.getFullYear() - 3; yy <= now.getFullYear() + 2; yy++) years.push(yy);
     return `<article class="okh-card">
-      <h2>${y}년 ${m}월 학사</h2>
+      <div class="okh-cal-nav">
+        <button type="button" class="okh-btn ghost" data-cal="prev">이전 달</button>
+        <h2>${y}년 ${m}월 학사</h2>
+        <button type="button" class="okh-btn ghost" data-cal="next">다음 달</button>
+        <button type="button" class="okh-btn ghost" data-cal="today">오늘</button>
+        <select class="okh-select" data-cal="year">
+          ${years.map((yy) => `<option value="${yy}" ${yy === y ? "selected" : ""}>${yy}년</option>`).join("")}
+        </select>
+      </div>
       <div class="okh-cal">
         ${["일", "월", "화", "수", "목", "금", "토"].map((d) => `<div class="okh-dow">${d}</div>`).join("")}
         ${cells}
       </div>
-      <p class="okh-note">시험·고사·평가는 붉은 테두리. 방학·휴업은 흐리게. NEIS 행사명 기준입니다. 시험 범위는 없습니다.</p>
+      <h3 style="margin:14px 0 8px">이달 일정 ${monthRows.length}건</h3>
+      ${
+        monthRows.length
+          ? `<ul class="okh-list okh-month-list">${monthRows
+              .map((e) => `<li><span class="okh-chip is-${tagEvent(e.EVENT_NM)}">${esc(tagEvent(e.EVENT_NM))}</span>${esc(e.AA_YMD.slice(4, 6))}/${esc(e.AA_YMD.slice(6))} · ${esc(e.EVENT_NM)}</li>`)
+              .join("")}</ul>`
+          : `<p class="okh-empty">이달 NEIS 학사 일정이 없습니다. 방학이면 정상입니다.</p>`
+      }
+      <p class="okh-note">이전·다음으로 3년 전~2년 후 달을 봅니다. 시험은 붉은 테두리, 방학은 흐리게. 시험 범위는 NEIS에 없습니다.</p>
     </article>`;
   }
 
@@ -400,6 +430,34 @@ export function createHub(options = {}) {
     root.querySelectorAll("[data-view]").forEach((btn) => {
       btn.addEventListener("click", () => {
         state.view = btn.getAttribute("data-view");
+        paint();
+      });
+    });
+    root.querySelectorAll("[data-cal]").forEach((el) => {
+      const act = el.getAttribute("data-cal");
+      if (act === "year") {
+        el.addEventListener("change", () => {
+          state.calYear = Number(el.value);
+          paint();
+        });
+        return;
+      }
+      el.addEventListener("click", () => {
+        const n = seoulNow();
+        const minY = n.getFullYear() - 3;
+        const maxY = n.getFullYear() + 2;
+        if (act === "prev") {
+          if (state.calMonth === 1) { state.calMonth = 12; state.calYear -= 1; }
+          else state.calMonth -= 1;
+        } else if (act === "next") {
+          if (state.calMonth === 12) { state.calMonth = 1; state.calYear += 1; }
+          else state.calMonth += 1;
+        } else if (act === "today") {
+          state.calYear = n.getFullYear();
+          state.calMonth = n.getMonth() + 1;
+        }
+        if (state.calYear < minY) { state.calYear = minY; state.calMonth = 1; }
+        if (state.calYear > maxY) { state.calYear = maxY; state.calMonth = 12; }
         paint();
       });
     });

@@ -3,3 +3,4 @@ node_modules/
 *.log
 data/neis/schoolInfo-J10.json
 data/neis/acaInsTiInfo-J10.json
+.vercel

@@ -26,3 +26,8 @@ export function examWeeks(rows) {
   }
   return weeks;
 }
+
+export function yearSpan(now, past = 1, future = 1) {
+  const y = now.getFullYear();
+  return { from: `${y - past}0101`, to: `${y + future}1231` };
+}
