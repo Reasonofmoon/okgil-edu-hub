@@ -37,6 +37,10 @@ import {
   nearRange,
   pickQuote,
   QUOTE_CUTTER,
+  pickStudyTip,
+  studyChip,
+  studyWatermarkLines,
+  STUDY_SOURCE,
 } from "../core/index.js";
 
 const VIEWS = [
@@ -48,6 +52,20 @@ const VIEWS = [
   ["gap", "갭"],
   ["students", "원생"],
 ];
+
+function studyLine(slot, seed) {
+  const tip = pickStudyTip(slot, seed);
+  return `<p class="okh-study-line"><strong>${esc(tip.title)}</strong> ${esc(tip.line)}</p>`;
+}
+
+function studyCard(slot, seed) {
+  const tip = pickStudyTip(slot, seed);
+  return `<article class="okh-card okh-study-card">
+    <h3>${esc(STUDY_SOURCE)}</h3>
+    <h2>${esc(tip.title)}</h2>
+    <p class="okh-empty">${esc(tip.line)}</p>
+  </article>`;
+}
 
 function schoolKind(kind = "") {
   if (/초등/.test(kind)) return { short: "초", cls: "is-cho" };
@@ -231,16 +249,16 @@ export function createHub(options = {}) {
     const { bounds, exams, examsThisWeek, offs, events } = curated;
     const dishes = state.cache.mealsToday?.[0] ? parseDish(state.cache.mealsToday[0].DDISH_NM) : [];
     let mood = "calm";
-    let speech = `${school.name} 이번 주는 잔잔해요. 평소 루틴이면 충분해요.`;
+    let speech = `${school.name} 이번 주는 잔잔해요. 명사 둘을 동사 하나로 잇는 문장 세 개만 써 봐요.`;
     if (examsThisWeek.length) {
       mood = "exam";
       speech = `이번 주 ${school.name}에 ${examsThisWeek[0].EVENT_NM}이 있어요. 시험 범위는 학교에 물어봐야 해요.`;
     } else if (exams.length) {
       mood = "exam";
-      speech = `${formatMd(exams[0].AA_YMD)}에 ${exams[0].EVENT_NM}이 다가와요. 지금부터 리듬만 잡아도 돼요.`;
+      speech = `${formatMd(exams[0].AA_YMD)}에 ${exams[0].EVENT_NM}이 다가와요. 노트를 보며 그리지 말고, 덮고 2차 지도를 그려 봐요.`;
     } else if (offs.length) {
       mood = "off";
-      speech = `이번 주 쉬는 날이 있어요. 책 읽기 좋은 주예요.`;
+      speech = `이번 주 쉬는 날이 있어요. 책을 덮고 인물과 이유를 동사로 이어 봐요.`;
     }
     const weekLabel = `${bounds.monday.getMonth() + 1}월 ${bounds.monday.getDate()}일 – ${bounds.sunday.getMonth() + 1}월 ${bounds.sunday.getDate()}일`;
     const cards = [];
@@ -251,7 +269,7 @@ export function createHub(options = {}) {
         "시험 범위·준비물은 NEIS에 없습니다. 가정통신문이나 학교에 확인해 주세요.",
         exams.length > 1 ? `<ul class="okh-list">${exams.slice(0, 4).map((e) => `<li>${esc(formatMd(e.AA_YMD))} · ${esc(e.EVENT_NM)}</li>`).join("")}</ul>` : ""));
     } else {
-      cards.push(briefCard("calm", "시험", "이번 주 시험 없음", "가까운 2주 안에도 고사·평가가 보이지 않아요."));
+      cards.push(briefCard("calm", "시험", "이번 주 시험 없음", pickStudyTip("empty", now.getTime()).line));
     }
     if (offs.length) {
       cards.push(briefCard("off", "방학·휴업",
@@ -264,7 +282,7 @@ export function createHub(options = {}) {
         "시험·방학이 아닌 행사만 추렸어요.",
         `<ul class="okh-list">${events.slice(0, 5).map((e) => `<li>${esc(formatMd(e.AA_YMD))} · ${esc(e.EVENT_NM)}</li>`).join("")}</ul>`));
     } else if (!examsThisWeek.length && !offs.length) {
-      cards.push(briefCard("calm", "일정", "특별한 학사 없음", "이번 주는 평소 수업으로 보여요."));
+      cards.push(briefCard("calm", "일정", "특별한 학사 없음", pickStudyTip("daily", now.getDate()).line));
     }
     if (dishes.length) {
       const names = dishes.map((d) => d.replace(/\(\d.*$/, "")).filter(Boolean);
@@ -313,7 +331,7 @@ export function createHub(options = {}) {
         }).join("")}</ul>
         <p class="okh-note">수능·6월·9월 모평은 <a href="https://www.suneung.re.kr/main.do" target="_blank" rel="noopener">평가원</a> 공고. 학평은 교육청 일정안입니다.</p>
       </article>` : ""}
-      <div class="okh-grid okh-cols-2 okh-brief">${cards.join("")}</div>
+      ${(!focus || !tip) ? studyCard("empty", now.getDate()) : ""}<div class="okh-grid okh-cols-2 okh-brief">${cards.join("")}</div>
       <p class="okh-brief-more"><button type="button" class="okh-btn ghost" data-view="calendar">달력 보기</button></p>`;
   }
 
@@ -344,7 +362,7 @@ export function createHub(options = {}) {
               ? `<ul class="okh-list">${todayEvents
                   .map((e) => `<li><span class="okh-chip is-${tagEvent(e.EVENT_NM)}">${esc(tagEvent(e.EVENT_NM))}</span>${esc(e.EVENT_NM)}</li>`)
                   .join("")}</ul>`
-              : `<p class="okh-empty">오늘 학사 행사가 없습니다.</p>`
+              : `<p class="okh-empty">오늘 학사 행사가 없습니다.</p>${studyLine("empty", Number(today))}`
           }
         </article>
         <article class="okh-card">
@@ -355,7 +373,7 @@ export function createHub(options = {}) {
                   .map((r) => `<li>${esc(r.PERIO)}교시 · ${esc(r.ITRT_CNTNT)}</li>`)
                   .join("")}</ul>
                  ${last ? `<p class="okh-note">마지막 교시 ${esc(last.PERIO)} · 하교 슬롯 후보</p>` : ""}`
-              : `<p class="okh-empty">오늘 시간표가 없습니다. 방학·휴업이면 정상입니다.</p>`
+              : `<p class="okh-empty">오늘 시간표가 없습니다. 방학·휴업이면 정상입니다.</p>${studyLine("off", Number(today) + 1)}`
           }
         </article>
         <article class="okh-card">
@@ -365,7 +383,7 @@ export function createHub(options = {}) {
               ? `<ul class="okh-list">${dishes
                   .map((d) => `<li>${esc(d.replace(/\(\d.*$/, ""))}${allergenNames(d).length ? ` <span class="okh-chip">${esc(allergenNames(d).join(", "))}</span>` : ""}</li>`)
                   .join("")}</ul>`
-              : `<p class="okh-empty">오늘 급식이 없습니다.</p>`
+              : `<p class="okh-empty">오늘 급식이 없습니다.</p>${studyLine("daily", Number(today) + 2)}`
           }
           <h3 style="margin-top:12px">내일 급식</h3>
           ${tom.length ? `<p>${esc(tom.map((d) => d.replace(/\(\d.*$/, "")).join(" · "))}</p>` : `<p class="okh-empty">내일 식단이 아직 없습니다.</p>`}
@@ -378,7 +396,7 @@ export function createHub(options = {}) {
             ? `<ul class="okh-list">${weekEvents
                 .map((e) => `<li>${esc(e.AA_YMD.slice(4, 6))}/${esc(e.AA_YMD.slice(6))} · ${esc(e.EVENT_NM)}</li>`)
                 .join("")}</ul>`
-            : `<p class="okh-empty">이번 주 등록된 행사가 없습니다.</p>`
+            : `<p class="okh-empty">이번 주 등록된 행사가 없습니다.</p>${studyLine("empty", now.getDay() + 3)}`
         }
       </article>`;
   }
@@ -410,10 +428,10 @@ export function createHub(options = {}) {
         kinds.includes("off") ? "is-off" : "",
         ymd === today ? "is-today" : "",
       ].filter(Boolean).join(" ");
-      cells += `<div class="okh-day ${cls}"><strong>${d}</strong>${ev
-        .slice(0, 3)
-        .map((e) => `<div>${esc(e.EVENT_NM)}</div>`)
-        .join("")}</div>`;
+      const extra = ev.length
+        ? ev.slice(0, 3).map((e) => `<div>${esc(e.EVENT_NM)}</div>`).join("")
+        : `<div class="okh-day-tip">${esc(studyChip(y * 100 + m * 40 + d))}</div>`;
+      cells += `<div class="okh-day ${cls}"><strong>${d}</strong>${extra}</div>`;
     }
     const years = [];
     for (let yy = now.getFullYear() - 3; yy <= now.getFullYear() + 2; yy++) years.push(yy);
@@ -437,10 +455,10 @@ export function createHub(options = {}) {
           ? `<ul class="okh-list okh-month-list">${monthRows
               .map((e) => `<li><span class="okh-chip is-${tagEvent(e.EVENT_NM)}">${esc(tagEvent(e.EVENT_NM))}</span>${esc(e.AA_YMD.slice(4, 6))}/${esc(e.AA_YMD.slice(6))} · ${esc(e.EVENT_NM)}</li>`)
               .join("")}</ul>`
-          : `<p class="okh-empty">이달 NEIS 학사 일정이 없습니다. 방학이면 정상입니다.</p>`
+          : `<p class="okh-empty">이달 NEIS 학사 일정이 없습니다. 방학이면 정상입니다.</p>${studyLine("off", y * 12 + m)}`
       }
-      <p class="okh-note">이전·다음으로 3년 전~2년 후 달을 봅니다. 시험은 붉은 테두리, 방학은 흐리게. 시험 범위는 NEIS에 없습니다.</p>
-    </article>`;
+      <p class="okh-note">이전·다음으로 3년 전~2년 후 달을 봅니다. 시험은 붉은 테두리, 방학은 흐리게. 빈 칸은 공부법 한 줄입니다.</p>
+    </article>${studyCard("daily", y * 12 + m)}`;
   }
 
   function viewMap() {
@@ -490,9 +508,9 @@ export function createHub(options = {}) {
 
   function viewReading() {
     const checks = loadChecks();
-    return `<article class="okh-card">
+    return `${studyCard("reading", 1)}<article class="okh-card">
       <h2>독서 루프</h2>
-      <p class="okh-empty">문해력 권장 도서. 도서관 소장 여부는 호스트가 정보나루를 붙이면 켜집니다.</p>
+      <p class="okh-empty">문해력 권장 도서. 읽고 나서 인물·사건·이유를 동사로 이어 보세요. 도서관 소장 여부는 호스트가 정보나루를 붙이면 켜집니다.</p>
       <ul class="okh-list">${READING_LOOP.map((b) => {
         const on = !!checks[b.isbn];
         return `<li>
@@ -526,7 +544,7 @@ export function createHub(options = {}) {
                   return `<li>${esc(s.name)} · 주 ${s.passes}패스 · 오늘 학교 문해 ${lit.ko + lit.en}교시 · 차 ${gap}</li>`;
                 })
                 .join("")}</ul>`
-            : `<p class="okh-empty">이 학교 원생을 원생 탭에서 넣으면 갭이 계산됩니다.</p>`
+            : `<p class="okh-empty">이 학교 원생을 원생 탭에서 넣으면 갭이 계산됩니다.</p>${studyLine("en", 8)}`
         }
       </article>
     </div>`;
@@ -557,7 +575,7 @@ export function createHub(options = {}) {
                 <button type="button" class="okh-btn ghost" data-del="${r.id}">빼기</button></li>`;
               })
               .join("")
-          : `<li class="okh-empty">아직 없습니다. 학부모 등록의 조인 키입니다.</li>`
+          : `<li class="okh-empty">아직 없습니다. 학부모 등록의 조인 키입니다.</li><li>${studyLine("empty", 9)}</li>`
       }</ul>
     </article>`;
   }
@@ -574,11 +592,14 @@ export function createHub(options = {}) {
 
   function paint() {
     const school = schoolByCode(state.schoolCode, state.schools);
+    const tip = pickStudyTip(state.view === "reading" ? "reading" : state.view === "calendar" ? "daily" : "any", Date.now());
+    const wm = studyWatermarkLines().join(" · ");
     root.innerHTML =
       renderBar() +
       renderTabs() +
-      `<div class="okh-body">${state.error ? `<p class="okh-empty">NEIS: ${esc(state.error)}</p>` : ""}${views[state.view]()}</div>` +
-      `<div class="okh-foot">리드마스터 · 출처 NEIS · ${esc(school.name)}</div>`;
+      `<aside class="okh-study" data-okh="study"><strong>${esc(tip.title)}</strong> ${esc(tip.line)} <em>${esc(STUDY_SOURCE)}</em></aside>` +
+      `<div class="okh-body"><div class="okh-wm" aria-hidden="true">${esc(wm)}</div>${state.error ? `<p class="okh-empty">NEIS: ${esc(state.error)}</p>` : ""}${views[state.view]()}</div>` +
+      `<div class="okh-foot">리드마스터 · 출처 NEIS · ${esc(school.name)} · ${esc(studyChip(new Date().getDate()))}</div>`;
 
     root.querySelectorAll("[data-okh-school]").forEach((btn) => {
       btn.addEventListener("click", async () => {
@@ -693,6 +714,11 @@ export function createHub(options = {}) {
         if (!box) return;
         const q = pickQuote(Date.now());
         box.innerHTML = `<p class="okh-quote-text">${esc(q.text)}</p><p class="okh-quote-by">${esc(q.by)} · <a href="${QUOTE_CUTTER}" target="_blank" rel="noopener">Quote Cutter</a></p>`;
+        const st = root.querySelector("[data-okh=study]");
+        if (st) {
+          const tip = pickStudyTip("any", Date.now());
+          st.innerHTML = `<strong>${esc(tip.title)}</strong> ${esc(tip.line)} <em>${esc(STUDY_SOURCE)}</em>`;
+        }
       }, 14000);
     }
   }

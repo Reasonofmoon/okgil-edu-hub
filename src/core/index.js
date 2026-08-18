@@ -8,3 +8,4 @@ export * from "./books.js";
 export * from "./storage.js";
 export * from "./exams.js";
 export * from "./quotes.js";
+export * from "./studyTips.js";

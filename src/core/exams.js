@@ -104,8 +104,8 @@ const TIPS = [
   {
     from: 21,
     to: 30,
-    title: "한 달 전 · 나눠 외우기",
-    body: "한 번에 몰아 읽기보다, 같은 내용을 며칠 간격으로 다시 꺼내는 편이 오래 남습니다. 시험 범위를 주 단위로만 쪼개 보세요.",
+    title: "한 달 전 · 간격 두고 복원",
+    body: "같은 노트를 매일 보지 마세요. 핵심 개념 5~9개를 고르고, 다음 날·3일·7일·14일 뒤 빈 종이에 다시 그립니다. 몰아 읽기보다 꺼내기가 남습니다.",
     refs: [
       { label: "Cepeda et al., 2006, Psychological Science", href: "https://doi.org/10.1111/j.1467-9280.2006.01763.x" },
       { label: "Dunlosky et al., 2013, PSPI", href: "https://doi.org/10.1177/1529100612453266" },
@@ -114,8 +114,8 @@ const TIPS = [
   {
     from: 14,
     to: 20,
-    title: "2주 전 · 다시 꺼내기",
-    body: "밑줄만 긋지 말고, 책을 덮고 방금 읽은 걸 빈칸에 적어 보세요. 인출 연습이 재읽기보다 시험에 가깝습니다.",
+    title: "2주 전 · 덮고 2차 지도",
+    body: "자료를 보며 그린 1차 지도는 정리입니다. 책을 덮고 빈 종이에 개념·종류·동사 관계를 다시 그리세요. 두 지도의 차이가 지금 구멍입니다.",
     refs: [
       { label: "Roediger & Karpicke, 2006, Psychological Science", href: "https://doi.org/10.1111/j.1467-9280.2006.01693.x" },
       { label: "Dunlosky et al., 2013, PSPI", href: "https://doi.org/10.1177/1529100612453266" },
@@ -124,8 +124,8 @@ const TIPS = [
   {
     from: 8,
     to: 13,
-    title: "열흘 전 · 섞어 풀기",
-    body: "한 과목만 파기보다 국어·영어를 번갈아 풀면 시험장 전환이 쉬워집니다. 오답은 ‘왜 틀렸는지’ 한 줄만 남기세요.",
+    title: "열흘 전 · 노트를 질문으로",
+    body: "관계와 규칙을 질문으로 바꾸세요. 왜·조건이 바뀌면·비교·오류 탐지. 좋은 노트는 답을 담은 노트가 아니라 스스로 시험해볼 질문을 만드는 노트입니다.",
     refs: [
       { label: "Rohrer & Taylor, 2007, Applied Cognitive Psychology", href: "https://doi.org/10.1002/acp.1266" },
       { label: "IES Practice Guide, 2007", href: "https://ies.ed.gov/ncee/wwc/PracticeGuide/1" },
@@ -134,8 +134,8 @@ const TIPS = [
   {
     from: 4,
     to: 7,
-    title: "일주일 전 · 노트는 질문으로",
-    body: "필기는 베끼지 말고 왼쪽은 질문, 오른쪽은 답으로 나누세요. 잠자기 전 20분이 낮의 두 시간보다 나을 수 있습니다.",
+    title: "일주일 전 · 15분 루틴",
+    body: "읽기 4분, 연결 4분, 덮고 복원 4분, 검증 2분, 한 문장 1분. “핵심은 A가 B에 영향을 주어 C로 이어진다”가 안 되면 아직 구조가 없습니다.",
     refs: [
       { label: "Pauk, How to Study in College (Cornell notes)", href: "https://lsc.cornell.edu/how-to-study/taking-notes/cornell-note-taking-system/" },
       { label: "Diekelmann & Born, 2010, Nat. Rev. Neurosci.", href: "https://doi.org/10.1038/nrn2762" },
@@ -144,8 +144,8 @@ const TIPS = [
   {
     from: 1,
     to: 3,
-    title: "사흘 전 · 새 진도는 그만",
-    body: "새 범위를 넣지 마세요. 이미 푼 오답과 공식만 훑고, 잠을 지키는 게 점수에 더 가깝습니다.",
+    title: "사흘 전 · 사다리에서 내려온다",
+    body: "복잡한 양식을 접고 덮고 복원만 반복하세요. 오답은 실패가 아니라 인과가 뒤집힌 좌표입니다. 왜 틀렸는지 한 줄만 남기세요.",
     refs: [
       { label: "Diekelmann & Born, 2010, Nat. Rev. Neurosci.", href: "https://doi.org/10.1038/nrn2762" },
       { label: "Dunlosky et al., 2013, PSPI", href: "https://doi.org/10.1177/1529100612453266" },
@@ -154,8 +154,8 @@ const TIPS = [
   {
     from: 0,
     to: 0,
-    title: "당일 · 루틴만",
-    body: "아침은 평소처럼. 새 자료는 보지 말고, 8시 10분 입실(수능)처럼 학교 시각에 맞춰 미리 나가세요.",
+    title: "당일 · 새 지도는 그만",
+    body: "새 자료를 펼치지 마세요. 명사 둘을 동사 하나로 잇는 문장 세 개만 속으로 복원하고, 평소 루틴으로 입실하세요.",
     refs: [
       { label: "평가원 수능 시험개요", href: "https://suneung.re.kr/sub/info.do?m=0101&s=suneung" },
     ],
