@@ -21,10 +21,12 @@
   "files": ["src", "README.md"],
   "scripts": {
     "demo": "node demo/proxy.mjs",
-    "start": "node demo/proxy.mjs"
+    "start": "node demo/proxy.mjs",
+    "collect": "node scripts/collect-neis.mjs"
   },
   "keywords": ["okgil", "neis", "education", "embed", "leadmaster"],
   "license": "UNLICENSED",
+  "engines": { "node": ">=18" },
   "peerDependencies": {
     "react": ">=18"
   },

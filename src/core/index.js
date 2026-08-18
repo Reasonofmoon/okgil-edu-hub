@@ -1,4 +1,5 @@
 export * from "./schools.js";
+export * from "./catalog.js";
 export * from "./neis.js";
 export * from "./calendar.js";
 export * from "./timetable.js";

@@ -1,12 +1,31 @@
-html, body { margin: 0; background: #e8e2d6; color: #1c1914; font-family: Pretendard, "Apple SD Gothic Neo", sans-serif; }
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; background: #e8e2d6; color: #1c1914; font-family: Pretendard, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
 .host-bar {
-  display: flex; justify-content: space-between; align-items: center;
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
   padding: 12px 20px; background: #1f4d43; color: #f4efe6;
 }
 .host-bar span { opacity: .75; margin-left: 10px; font-size: 13px; }
 .host-bar nav span { margin-left: 16px; opacity: .55; }
 .host-bar nav .on { opacity: 1; border-bottom: 1px solid #f4efe6; padding-bottom: 2px; }
-main { display: grid; grid-template-columns: 240px 1fr; gap: 16px; padding: 16px; }
-.host-side { font-size: 13px; color: #5c564b; }
-.host-side pre { white-space: pre-wrap; background: #fffdf8; border: 1px solid #ddd4c4; border-radius: 10px; padding: 10px; min-height: 120px; }
-@media (max-width: 800px) { main { grid-template-columns: 1fr; } }
+main {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+#okgil-slot { width: 100%; min-height: 480px; }
+.host-side { font-size: 13px; color: #5c564b; min-width: 0; }
+.host-side details { border: 1px solid #ddd4c4; border-radius: 10px; background: #fffdf8; padding: 8px 12px; }
+.host-side summary { cursor: pointer; color: #6b6458; }
+.host-events { margin: 8px 0 0; padding: 0; list-style: none; }
+.host-events li {
+  padding: 8px 0;
+  border-top: 1px solid #eee6d8;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.host-events li:first-child { border-top: 0; }
+.host-events .t { color: #8a8274; margin-right: 8px; }
+.host-events .k { font-weight: 600; margin-right: 8px; }

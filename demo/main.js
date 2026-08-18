@@ -1,15 +1,22 @@
 import { mountOkgilEduHub } from "/src/index.js";
 
 const log = document.getElementById("host-events");
-const lines = [];
+
+function row(e) {
+  const time = new Date().toLocaleTimeString("ko-KR");
+  const label = e.schoolName || e.studentId || e.start || "";
+  const li = document.createElement("li");
+  li.innerHTML = `<span class="t">${time}</span><span class="k">${e.type}</span><span>${label}</span>`;
+  return li;
+}
 
 const handle = mountOkgilEduHub(document.getElementById("okgil-slot"), {
   officeCode: "J10",
   proxyUrl: "/api/neis",
   theme: "light",
   onEvent(e) {
-    lines.unshift(`${new Date().toLocaleTimeString("ko-KR")}  ${e.type}  ${JSON.stringify(e)}`);
-    log.textContent = lines.slice(0, 12).join("\n");
+    log.prepend(row(e));
+    while (log.children.length > 8) log.lastElementChild.remove();
   },
 });
 

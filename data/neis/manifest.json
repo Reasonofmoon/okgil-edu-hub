@@ -1,0 +1,16 @@
+{
+  "collectedAt": "2026-08-18T18:12:03.000Z",
+  "office": "J10",
+  "counts": {
+    "schoolsJ10": 2667,
+    "academiesJ10": 39208,
+    "schoolsBucheon": 134,
+    "schoolsOkgil": 5,
+    "academiesBucheon": 2064,
+    "schedules": 5
+  },
+  "range": {
+    "from": "20260801",
+    "to": "20260930"
+  }
+}

@@ -1,6 +1,7 @@
 import {
   OKGIL_SCHOOLS,
   ACADEMY_POIS,
+  loadCatalog,
   schoolByCode,
   fetchSchedule,
   fetchMeals,
@@ -75,6 +76,14 @@ export function createHub(options = {}) {
       now: seoulNow(),
       today: formatYmd(seoulNow()),
     },
+    academies: ACADEMY_POIS.map((p) => ({
+      id: p.id, name: p.name, kind: p.kind, realm: "", course: "", status: "개원",
+      address: p.note, tel: "", area: "okgil", isLeadmaster: p.id === "lm",
+    })),
+    manifest: null,
+    mapArea: "okgil",
+    mapRealm: "",
+    mapQ: "",
     error: "",
   };
 
@@ -127,12 +136,13 @@ export function createHub(options = {}) {
           <small>리드마스터 · ${esc(school.name)}</small>
         </div>
         <select class="okh-select" data-okh="school">
-          ${state.schools
-            .map(
-              (s) =>
-                `<option value="${s.schoolCode}" ${s.schoolCode === state.schoolCode ? "selected" : ""}>${esc(s.name)}</option>`
-            )
-            .join("")}
+          ${(() => {
+            const ok = state.schools.filter((s) => s.area === "okgil" || /옥길/.test(s.name + (s.address || "")));
+            const rest = state.schools.filter((s) => !ok.includes(s));
+            const opt = (s) => `<option value="${s.schoolCode}" ${s.schoolCode === state.schoolCode ? "selected" : ""}>${esc(s.name)}</option>`;
+            if (!rest.length) return ok.concat(state.schools).filter((s, i, a) => a.indexOf(s) === i).map(opt).join("");
+            return `<optgroup label="옥길">${ok.map(opt).join("")}</optgroup><optgroup label="부천">${rest.map(opt).join("")}</optgroup>`;
+          })()}
         </select>
       </div>`;
   }
@@ -249,21 +259,42 @@ export function createHub(options = {}) {
   }
 
   function viewMap() {
+    const schools = state.schools.filter((s) => s.area === "okgil" || /옥길/.test(s.name + (s.address || "")));
+    let list = state.academies.slice();
+    if (state.mapArea === "okgil") list = list.filter((a) => a.area === "okgil" || a.isLeadmaster);
+    if (state.mapRealm) list = list.filter((a) => (a.realm || "").includes(state.mapRealm) || (a.course || "").includes(state.mapRealm));
+    if (state.mapQ) {
+      const q = state.mapQ.toLowerCase();
+      list = list.filter((a) => `${a.name} ${a.address}`.toLowerCase().includes(q));
+    }
+    list.sort((a, b) => Number(b.isLeadmaster) - Number(a.isLeadmaster) || a.name.localeCompare(b.name, "ko"));
+    const shown = list.slice(0, 60);
+    const chip = (key, val, label) => `<button type="button" class="okh-tab" data-map="${key}:${val}" aria-selected="${state[key] === val}">${label}</button>`;
     return `<div class="okh-grid okh-cols-2">
       <article class="okh-card">
-        <h3>학교</h3>
-        <ul class="okh-list">${state.schools
+        <h3>옥길 학교 ${schools.length}</h3>
+        <ul class="okh-list">${schools
           .map(
             (s) => `<li class="okh-poi"><span><strong>${esc(s.name)}</strong><br><span class="okh-empty">${esc(s.address)}</span></span><span class="okh-chip">${esc(s.kind)}</span></li>`
           )
           .join("")}</ul>
       </article>
       <article class="okh-card">
-        <h3>학원 · 도서관</h3>
-        <ul class="okh-list">${ACADEMY_POIS.map(
-          (p) => `<li class="okh-poi"><span><strong>${esc(p.name)}</strong><br><span class="okh-empty">${esc(p.note)}</span></span><span class="okh-chip">${esc(p.kind)}</span></li>`
-        ).join("")}</ul>
-        <p class="okh-note">좌표 맵 SDK는 호스트가 붙입니다. 모듈은 목록과 학교코드를 줍니다.</p>
+        <h3>학원 · 교습소 ${list.length}</h3>
+        <div class="okh-tabs" style="padding:0 0 10px">
+          ${chip("mapArea", "okgil", "옥길")}
+          ${chip("mapArea", "bucheon", "부천 전체")}
+          ${chip("mapRealm", "", "전체 분야")}
+          ${chip("mapRealm", "보습", "보습")}
+          ${chip("mapRealm", "예능", "예능")}
+        </div>
+        <input class="okh-select" data-okh="aca-q" placeholder="학원 이름·주소 검색" value="${esc(state.mapQ)}" style="width:100%;margin-bottom:10px" />
+        <ul class="okh-list">${shown
+          .map(
+            (p) => `<li class="okh-poi"><span><strong>${esc(p.name)}</strong>${p.isLeadmaster ? ' <span class="okh-chip is-exam">우리 학원</span>' : ""}<br><span class="okh-empty">${esc(p.address)}</span></span><span class="okh-chip">${esc(p.realm || p.kind)}</span></li>`
+          )
+          .join("")}</ul>
+        <p class="okh-note">NEIS 학원·교습소 ${state.manifest?.counts?.academiesBucheon ?? list.length}곳 중 개원만. ${list.length > 60 ? `화면에는 60곳.` : ""} 좌표 맵은 호스트가 붙입니다.</p>
       </article>
     </div>`;
   }
@@ -357,7 +388,7 @@ export function createHub(options = {}) {
       renderBar() +
       renderTabs() +
       `<div class="okh-body">${state.error ? `<p class="okh-empty">NEIS: ${esc(state.error)}</p>` : ""}${views[state.view]()}</div>` +
-      `<div class="okh-foot">모듈 @leadmaster/okgil-edu-hub · 출처 NEIS · ${esc(school.schoolCode)}</div>`;
+      `<div class="okh-foot">모듈 @leadmaster/okgil-edu-hub · 출처 NEIS · ${esc(school.schoolCode)}${state.manifest ? ` · 경기 ${state.manifest.counts.schoolsJ10}교 · 부천 ${state.manifest.counts.schoolsBucheon}교 · 학원 ${state.manifest.counts.academiesBucheon}` : ""}</div>`;
 
     root.querySelector("[data-okh=school]")?.addEventListener("change", async (e) => {
       state.schoolCode = e.target.value;
@@ -371,6 +402,19 @@ export function createHub(options = {}) {
         state.view = btn.getAttribute("data-view");
         paint();
       });
+    });
+    root.querySelectorAll("[data-map]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const [k, v] = btn.getAttribute("data-map").split(":");
+        state[k] = v;
+        paint();
+      });
+    });
+    root.querySelector("[data-okh=aca-q]")?.addEventListener("input", (e) => {
+      state.mapQ = e.target.value;
+      paint();
+      const box = root.querySelector("[data-okh=aca-q]");
+      if (box) { box.focus(); box.setSelectionRange(box.value.length, box.value.length); }
     });
     root.querySelector("[data-okh=add-student]")?.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -395,6 +439,22 @@ export function createHub(options = {}) {
   }
 
   async function start() {
+    paint();
+    try {
+      const cat = await loadCatalog(options.dataUrl || "/data/neis");
+      state.manifest = cat.manifest;
+      if (cat.academies.length) state.academies = cat.academies;
+      if (cat.schools.length) {
+        const ok = cat.schools.filter((s) => s.area === "okgil");
+        const rest = cat.schools.filter((s) => s.area !== "okgil");
+        state.schools = [...ok, ...rest];
+        if (!state.schools.some((s) => s.schoolCode === state.schoolCode)) {
+          state.schoolCode = state.schools[0].schoolCode;
+        }
+      }
+    } catch (e) {
+      state.error = e.message || String(e);
+    }
     paint();
     await loadSchoolData();
     paint();

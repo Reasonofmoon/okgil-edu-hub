@@ -104,3 +104,55 @@ export async function fetchTimetable(school, dateYmd, extra = {}, options = {}) 
     CLASS_NM: extra.className,
   }, options);
 }
+
+
+function listTotal(json, key) {
+  const block = json?.[key];
+  const head = Array.isArray(block) ? block[0]?.head : null;
+  const hit = Array.isArray(head) ? head.find((h) => h.list_total_count != null) : null;
+  return Number(hit?.list_total_count || 0);
+}
+
+export async function neisGetPage(endpoint, params, options = {}) {
+  const rows = await neisGet(endpoint, params, options);
+  return rows;
+}
+
+export async function neisGetAll(endpoint, params, options = {}) {
+  const pSize = Number(params.pSize || 100);
+  const sleepMs = options.sleepMs ?? 200;
+  let pIndex = 1;
+  const all = [];
+  let total = Infinity;
+  while ((pIndex - 1) * pSize < total) {
+    const pageParams = { ...params, pIndex, pSize };
+    const q = new URLSearchParams({
+      Type: "json",
+      pIndex: String(pIndex),
+      pSize: String(pSize),
+      ...Object.fromEntries(
+        Object.entries(params).filter(([k, v]) => v != null && v !== "" && k !== "pSize" && k !== "pIndex")
+      ),
+    });
+    if (options.neisKey) q.set("KEY", options.neisKey);
+    let url;
+    if (options.proxyUrl) {
+      const u = new URL(options.proxyUrl, typeof location !== "undefined" ? location.origin : "http://localhost");
+      u.searchParams.set("path", endpoint);
+      for (const [k, v] of q) u.searchParams.set(k, v);
+      url = u.toString();
+    } else {
+      url = `${HUB}/${endpoint}?${q}`;
+    }
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`NEIS ${res.status}`);
+    const json = await res.json();
+    const rows = rowsOf(json, endpoint);
+    total = listTotal(json, endpoint) || (rows.length < pSize ? all.length + rows.length : total);
+    all.push(...rows);
+    if (!rows.length) break;
+    pIndex += 1;
+    if (sleepMs) await new Promise((r) => setTimeout(r, sleepMs));
+  }
+  return all;
+}
