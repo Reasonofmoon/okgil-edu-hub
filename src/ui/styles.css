@@ -236,16 +236,22 @@
 .okh-chip.is-etc { background: var(--okh-chip); color: var(--okh-mute); }
 
 .okh-quote {
-  background: var(--okh-paper);
-  border: 1px solid var(--okh-line);
-  border-radius: 16px;
-  padding: 14px 16px 12px;
-  margin-bottom: 14px;
-  box-shadow: 0 8px 20px rgba(80, 48, 28, 0.05);
+  display: block;
+  background: #3d6b5e;
+  color: #fff8ee;
+  padding: 16px 18px 14px;
+  border-bottom: 1px solid #2f564b;
 }
-.okh-quote-text { margin: 0 0 6px; font-size: 16px; line-height: 1.55; letter-spacing: -0.02em; }
-.okh-quote-by { margin: 0; font-size: 12px; color: var(--okh-mute); }
-.okh-quote-by a { color: var(--okh-pine); }
+.okh-quote-text {
+  margin: 0 0 6px;
+  font-size: 18px;
+  line-height: 1.5;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #fff8ee;
+}
+.okh-quote-by { margin: 0; font-size: 12px; color: #d9cbb6; }
+.okh-quote-by a { color: #f3e0a8; }
 .okh-dday-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 14px; }
 .okh-dday {
   border: 1px solid var(--okh-line);

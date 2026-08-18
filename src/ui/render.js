@@ -176,9 +176,17 @@ export function createHub(options = {}) {
     }
   }
 
+  function renderQuote() {
+    const q = pickQuote(Date.now());
+    return `<div class="okh-quote" data-okh="quote">
+      <p class="okh-quote-text">${esc(q.text)}</p>
+      <p class="okh-quote-by">${esc(q.by)} · <a href="${QUOTE_CUTTER}" target="_blank" rel="noopener">Quote Cutter</a></p>
+    </div>`;
+  }
+
   function renderBar() {
     const school = schoolByCode(state.schoolCode, state.schools);
-    return `
+    return renderQuote() + `
       <div class="okh-bar">
         <div class="okh-brand">옥길 교육정보 허브
           <small>리드마스터 · ${esc(school.name)}</small>
@@ -264,7 +272,6 @@ export function createHub(options = {}) {
     } else {
       cards.push(briefCard("meal", "오늘 급식", "식단 없음", "오늘 급식이 없어요. 방학이거나 아직 올라오지 않은 날이에요."));
     }
-    const q = pickQuote(now.getTime());
     const high = isHighSchool(school);
     const national = upcomingNational(now, high);
     const schoolSoon = upcomingSchoolExams(state.cache.schedule || [], now, 30);
@@ -272,10 +279,6 @@ export function createHub(options = {}) {
     const tip = focus ? tipForDays(focus.days) : null;
     const peer = state.cache.schoolExams || [];
     return `
-      <aside class="okh-quote" data-okh="quote">
-        <p class="okh-quote-text">“${esc(q.text)}”</p>
-        <p class="okh-quote-by">${esc(q.by)} · <a href="${QUOTE_CUTTER}" target="_blank" rel="noopener">Quote Cutter</a></p>
-      </aside>
       <section class="okh-hero is-${mood}">
         <img class="okh-mascot" src="/demo/assets/ridi.png" alt="리디" width="160" height="107" />
         <div class="okh-speech">
@@ -689,7 +692,7 @@ export function createHub(options = {}) {
         const box = root.querySelector("[data-okh=quote]");
         if (!box) return;
         const q = pickQuote(Date.now());
-        box.innerHTML = `<p class="okh-quote-text">“${esc(q.text)}”</p><p class="okh-quote-by">${esc(q.by)} · <a href="${QUOTE_CUTTER}" target="_blank" rel="noopener">Quote Cutter</a></p>`;
+        box.innerHTML = `<p class="okh-quote-text">${esc(q.text)}</p><p class="okh-quote-by">${esc(q.by)} · <a href="${QUOTE_CUTTER}" target="_blank" rel="noopener">Quote Cutter</a></p>`;
       }, 14000);
     }
   }
