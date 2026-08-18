@@ -206,3 +206,25 @@
   .okh-speech::before { display: none; }
   .okh-mascot { width: 96px; height: 96px; }
 }
+
+.okh-tab.okh-abbr, .okh-pills .okh-tab {
+  min-width: 44px;
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-size: 13px;
+}
+.okh-chip {
+  min-width: 36px;
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.okh-chip.is-cho { background: #dceee6; color: #2d6a5c; }
+.okh-chip.is-jung { background: #dce6f2; color: #3a5a80; }
+.okh-chip.is-go { background: #efe0f0; color: #6a3d6e; }
+.okh-chip.is-bosup { background: #f3d6ce; color: #8a2f1d; }
+.okh-chip.is-ye { background: #f6e4c8; color: #8a5a1d; }
+.okh-chip.is-pe { background: #d8efe4; color: #1f4d43; }
+.okh-chip.is-lang { background: #dde8f5; color: #2c4d7a; }
+.okh-chip.is-etc { background: var(--okh-chip); color: var(--okh-mute); }

@@ -29,14 +29,32 @@ import {
 } from "../core/index.js";
 
 const VIEWS = [
-  ["briefing", "이번 주"],
+  ["briefing", "주간"],
   ["calendar", "달력"],
   ["clock", "오늘"],
-  ["map", "옥길 맵"],
+  ["map", "맵"],
   ["reading", "독서"],
   ["gap", "갭"],
   ["students", "원생"],
 ];
+
+function schoolKind(kind = "") {
+  if (/초등/.test(kind)) return { short: "초", cls: "is-cho" };
+  if (/중학/.test(kind)) return { short: "중", cls: "is-jung" };
+  if (/고등/.test(kind)) return { short: "고", cls: "is-go" };
+  if (/특수/.test(kind)) return { short: "특", cls: "is-etc" };
+  return { short: String(kind).slice(0, 2) || "학", cls: "is-etc" };
+}
+
+function realmKind(realm = "", kind = "") {
+  const t = `${realm} ${kind}`;
+  if (/보습|입시|검정/.test(t)) return { short: "보습", cls: "is-bosup" };
+  if (/예능|미술|음악|무용|피아노/.test(t)) return { short: "예능", cls: "is-ye" };
+  if (/체육|스포츠/.test(t)) return { short: "체육", cls: "is-pe" };
+  if (/외국어|영어/.test(t)) return { short: "외", cls: "is-lang" };
+  const s = String(realm || kind).replace(/[·\s()대소원교습및]/g, "");
+  return { short: (s.slice(0, 2) || "기타"), cls: "is-etc" };
+}
 
 function el(html) {
   const t = document.createElement("template");
@@ -233,7 +251,7 @@ export function createHub(options = {}) {
         </div>
       </section>
       <div class="okh-grid okh-cols-2 okh-brief">${cards.join("")}</div>
-      <p class="okh-brief-more"><button type="button" class="okh-btn ghost" data-view="calendar">달력에서 더 보기</button></p>`;
+      <p class="okh-brief-more"><button type="button" class="okh-btn ghost" data-view="calendar">달력 보기</button></p>`;
   }
 
   function viewClock() {
@@ -338,9 +356,9 @@ export function createHub(options = {}) {
     for (let yy = now.getFullYear() - 3; yy <= now.getFullYear() + 2; yy++) years.push(yy);
     return `<article class="okh-card">
       <div class="okh-cal-nav">
-        <button type="button" class="okh-btn ghost" data-cal="prev">이전 달</button>
+        <button type="button" class="okh-btn ghost" data-cal="prev">이전</button>
         <h2>${y}년 ${m}월 학사</h2>
-        <button type="button" class="okh-btn ghost" data-cal="next">다음 달</button>
+        <button type="button" class="okh-btn ghost" data-cal="next">다음</button>
         <button type="button" class="okh-btn ghost" data-cal="today">오늘</button>
         <select class="okh-select" data-cal="year">
           ${years.map((yy) => `<option value="${yy}" ${yy === y ? "selected" : ""}>${yy}년</option>`).join("")}
@@ -373,30 +391,32 @@ export function createHub(options = {}) {
     }
     list.sort((a, b) => Number(b.isLeadmaster) - Number(a.isLeadmaster) || a.name.localeCompare(b.name, "ko"));
     const shown = list.slice(0, 60);
-    const chip = (key, val, label) => `<button type="button" class="okh-tab" data-map="${key}:${val}" aria-selected="${state[key] === val}">${label}</button>`;
+    const chip = (key, val, label) => `<button type="button" class="okh-tab okh-abbr" data-map="${key}:${val}" aria-selected="${state[key] === val}">${label}</button>`;
     return `<div class="okh-grid okh-cols-2">
       <article class="okh-card">
         <h3>옥길 학교 ${schools.length}</h3>
         <ul class="okh-list">${schools
-          .map(
-            (s) => `<li class="okh-poi"><span><strong>${esc(s.name)}</strong><br><span class="okh-empty">${esc(s.address)}</span></span><span class="okh-chip">${esc(s.kind)}</span></li>`
-          )
+          .map((s) => {
+            const k = schoolKind(s.kind);
+            return `<li class="okh-poi"><span><strong>${esc(s.name)}</strong><br><span class="okh-empty">${esc(s.address)}</span></span><span class="okh-chip ${k.cls}" title="${esc(s.kind)}">${esc(k.short)}</span></li>`;
+          })
           .join("")}</ul>
       </article>
       <article class="okh-card">
         <h3>학원 · 교습소 ${list.length}</h3>
-        <div class="okh-tabs" style="padding:0 0 10px">
+        <div class="okh-tabs okh-pills" style="padding:0 0 10px">
           ${chip("mapArea", "okgil", "옥길")}
-          ${chip("mapArea", "bucheon", "부천 전체")}
-          ${chip("mapRealm", "", "전체 분야")}
+          ${chip("mapArea", "bucheon", "부천")}
+          ${chip("mapRealm", "", "전체")}
           ${chip("mapRealm", "보습", "보습")}
           ${chip("mapRealm", "예능", "예능")}
         </div>
         <input class="okh-select" data-okh="aca-q" placeholder="학원 이름·주소 검색" value="${esc(state.mapQ)}" style="width:100%;margin-bottom:10px" />
         <ul class="okh-list">${shown
-          .map(
-            (p) => `<li class="okh-poi"><span><strong>${esc(p.name)}</strong>${p.isLeadmaster ? ' <span class="okh-chip is-exam">우리 학원</span>' : ""}<br><span class="okh-empty">${esc(p.address)}</span></span><span class="okh-chip">${esc(p.realm || p.kind)}</span></li>`
-          )
+          .map((p) => {
+            const k = realmKind(p.realm, p.kind);
+            return `<li class="okh-poi"><span><strong>${esc(p.name)}</strong>${p.isLeadmaster ? ' <span class="okh-chip is-exam">우리</span>' : ""}<br><span class="okh-empty">${esc(p.address)}</span></span><span class="okh-chip ${k.cls}" title="${esc(p.realm || p.kind)}">${esc(k.short)}</span></li>`;
+          })
           .join("")}</ul>
         <p class="okh-note">NEIS 학원·교습소 ${state.manifest?.counts?.academiesBucheon ?? list.length}곳 중 개원만. ${list.length > 60 ? `화면에는 60곳.` : ""} 좌표 맵은 호스트가 붙입니다.</p>
       </article>
