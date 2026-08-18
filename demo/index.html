@@ -343,6 +343,22 @@ main {
 .okh-study-line strong { color: var(--okh-pine); display: block; font-size: 12px; margin-bottom: 2px; }
 .okh-study-card { margin: 12px 0; background: linear-gradient(180deg, #fff8ee, var(--okh-paper)); }
 .okh-day-tip { font-size: 10px; color: var(--okh-pine); opacity: 0.72; margin-top: 4px; font-weight: 600; }
+.okh-dish { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.okh-dish-name { font-weight: 600; overflow-wrap: anywhere; }
+.okh-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.okh-tag {
+  display: inline-block;
+  width: auto;
+  height: auto;
+  min-width: 0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--okh-chip);
+  color: var(--okh-mute);
+  font-size: 11px;
+  line-height: 1.4;
+  font-weight: 600;
+}
 
     </style>
   </head>
@@ -363,6 +379,6 @@ main {
         <div id="okgil-slot"></div>
       </section>
     </main>
-    <script type="module" src="/demo/main.js?v=12"></script>
+    <script type="module" src="/demo/main.js?v=13"></script>
   </body>
 </html>

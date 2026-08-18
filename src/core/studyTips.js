@@ -1,40 +1,42 @@
-/** Short excerpts from 온톨로지 인출 노트법 (노트를 지도로 바꾸는 공부법). */
-export const STUDY_SOURCE = "온톨로지 인출 노트법";
+/** Short, attributed lines from the 공부법 shelf. Paraphrase, not page quotes. */
+export const STUDY_SOURCE = "공부법 서가";
 
 export const STUDY_TIPS = [
-  { id: "map", slots: ["any", "empty", "daily"], title: "창고가 아니라 지도", line: "오래 남는 노트는 명사를 많이 적은 노트가 아니라, 명사 사이를 동사로 이은 노트입니다." },
-  { id: "recog", slots: ["any", "empty", "exam"], title: "보면 아는 것과 꺼내는 것", line: "노트를 보며 “알지”라고 느끼는 것은 재인입니다. 시험은 얼굴을 가리고 이름을 떠올리라고 합니다." },
-  { id: "device", slots: ["any", "daily"], title: "노트는 인출 장치", line: "옮겨 적기는 저장입니다. 노트는 완성품이 아니라, 책을 덮고 꺼내게 만드는 장치여야 합니다." },
-  { id: "pick", slots: ["empty", "daily", "reading"], title: "개념 5~9개", line: "한 단원에서 핵심만 5~9개 고르세요. “이 개념을 빼면 이야기가 무너지나?”가 기준입니다." },
-  { id: "kind", slots: ["empty", "ko", "en"], title: "종류표를 붙인다", line: "개념에 대상·원인·과정·결과·원리·사례·예외를 붙이면, 단어가 아니라 역할을 기억합니다." },
-  { id: "verb", slots: ["any", "empty", "daily"], title: "화살표에는 동사", line: "산업혁명 → 증기기관은 관계가 없습니다. “증기기관이 공장 생산을 확대했다”처럼 동사를 쓰세요." },
-  { id: "rule", slots: ["exam", "empty"], title: "절대 규칙", line: "암기한 학생은 비슷한 문제를 찾고, 이해한 학생은 이 문제에 적용할 규칙을 찾습니다." },
-  { id: "cover", slots: ["any", "exam", "empty"], title: "덮고 다시 그린다", line: "자료를 보며 그린 1차 지도는 정리입니다. 덮고 빈 종이에 그린 2차 지도가 인출입니다." },
-  { id: "err", slots: ["exam", "empty"], title: "틀린 부분이 좌표", line: "오답은 실패가 아닙니다. 인과가 뒤집힌 자리를 고치는 한 줄이 베껴 쓴 정답보다 오래 남습니다." },
-  { id: "q", slots: ["exam", "daily"], title: "노트를 질문으로", line: "좋은 노트는 답을 많이 담은 노트가 아니라, 나중에 스스로 시험해볼 질문을 많이 만드는 노트입니다." },
-  { id: "15", slots: ["daily", "empty", "exam"], title: "15분 루틴", line: "읽기 4분 · 연결 4분 · 덮고 복원 4분 · 검증 2분 · 한 문장 1분. 매일 거대한 지도를 그릴 필요는 없습니다." },
-  { id: "space", slots: ["exam", "daily"], title: "간격 두고 복원", line: "같은 노트를 매일 보지 마세요. 다음 날, 3일, 7일, 14일 뒤 빈 종이에 다시 그립니다." },
-  { id: "en", slots: ["en", "reading"], title: "영어는 논리 역할", line: "문장마다 해석만 적지 말고 주장·이유·근거·사례·반론·재반박·결론을 표시하세요." },
-  { id: "ko", slots: ["ko", "reading"], title: "국어는 근거를 검사", line: "주장의 강도보다, 근거가 그 주장을 정말 받치는지 보고, 필자 주장과 소개된 타인 주장을 나누세요." },
-  { id: "lv0", slots: ["empty", "daily", "off"], title: "동사 한 개부터", line: "오늘 배운 것에서 명사 둘을 동사 하나로 잇는 문장을 세 개만 쓰세요. 문장당 10초면 됩니다." },
-  { id: "lv1", slots: ["empty", "off"], title: "관계 세 형제", line: "먼저 세 관계만: ~이다(종류), ~의 부분이다, ~을 일으킨다. 뼈대가 저절로 드러납니다." },
-  { id: "down", slots: ["exam"], title: "시험 임박하면 내려온다", line: "시험 3일 전이면 복잡한 양식을 접고, 덮고 복원하는 15분 루틴만 반복하세요." },
-  { id: "one", slots: ["exam", "daily"], title: "한 문장 설명", line: "“핵심은 ______가 ______에 영향을 주어 결국 ______로 이어진다.” 한 문장이 안 되면 아직 구조가 없습니다." },
-  { id: "pretty", slots: ["empty", "off"], title: "예쁜 노트", line: "형광펜과 깔끔한 필기는 잘한 느낌이 듭니다. 시험장은 그 단서를 주지 않습니다." },
-  { id: "read", slots: ["reading"], title: "읽고 나서 지도", line: "책을 덮고 인물·사건·이유를 동사로 이어 보세요. 줄거리 복사는 읽은 척일 뿐입니다." },
+  { id: "retrieve", slots: ["any", "empty", "exam", "daily"], title: "다시 읽지 말고 꺼내라", line: "밑줄과 재읽기는 안다는 착각을 줍니다. 책을 덮고 방금 배운 걸 적어 보세요. 꺼내는 일이 곧 공부입니다.", by: "Make It Stick" },
+  { id: "space", slots: ["exam", "daily"], title: "한 번에 몰지 마라", line: "같은 내용을 며칠 간격으로 다시 꺼내는 편이, 시험 전날 몰아치기보다 오래 남습니다.", by: "Make It Stick" },
+  { id: "inter", slots: ["exam", "empty"], title: "섞어 풀어라", line: "한 유형만 반복하면 시험장 전환이 느려집니다. 국어·영어·다른 유형을 번갈아 푸세요.", by: "Make It Stick" },
+  { id: "forget", slots: ["empty", "off", "daily"], title: "잊는 것도 학습이다", line: "조금 잊은 뒤에 다시 꺼낼 때 기억이 더 단단해집니다. 막힌 느낌이 곧 연습이 먹히고 있다는 신호입니다.", by: "How We Learn" },
+  { id: "sleep", slots: ["exam", "daily"], title: "잠이 복습이다", line: "새로 넣은 내용은 잠자는 동안 정리됩니다. 시험 전날 새 진도보다 잠을 지키는 편이 점수에 가깝습니다.", by: "How We Learn" },
+  { id: "place", slots: ["empty", "off"], title: "장소를 바꿔 보라", line: "늘 같은 책상에서만 외우면 그 방에 기억이 묶입니다. 가끔 장소를 바꾸면 시험장에서도 잘 꺼냅니다.", by: "How We Learn" },
+  { id: "delib", slots: ["exam", "daily"], title: "약한 곳만 반복하라", line: "이미 되는 부분을 편하게 반복하는 건 연습이 아닙니다. 막히는 한 지점을 골라 피드백을 받으며 고치세요.", by: "Peak" },
+  { id: "repr", slots: ["empty", "exam"], title: "머릿속 모형을 만들어라", line: "전문가의 차이는 시간이 아니라, 문제를 한눈에 구조로 보는 머릿속 그림입니다. 오늘 단원을 그림으로 말해 보세요.", by: "Peak" },
+  { id: "direct", slots: ["exam", "daily"], title: "시험과 같은 방식으로", line: "보기만 하고 시험을 보면 이전이 안 됩니다. 실제 문제 형식 그대로 스스로 풀어 보세요.", by: "Ultralearning" },
+  { id: "drill", slots: ["exam"], title: "병목을 쪼개라", line: "막히는 한 기술만 따로 빼서 짧게 반복하세요. 전체를 처음부터 다시 하는 것보다 빠릅니다.", by: "Ultralearning" },
+  { id: "wm", slots: ["empty", "daily"], title: "한 번에 너무 많이 넣지 마라", line: "생각하는 자리(작업기억)는 좁습니다. 새 내용은 이미 아는 것과 연결할 때만 들어갑니다.", by: "Why Don’t Students Like School?" },
+  { id: "facts", slots: ["empty", "exam"], title: "지식이 생각을 켠다", line: "배경 지식이 있어야 독해도, 추론도 됩니다. 개념을 비운 채 ‘생각하는 법’만 연습할 수는 없습니다.", by: "Why Don’t Students Like School?" },
+  { id: "focus", slots: ["daily", "off"], title: "집중과 분산을 오가라", line: "막히면 그 자리에서 더 쥐어짜지 말고 잠시 걷거나 쉬세요. 느슨한 모드에서 연결이 붙는 경우가 많습니다.", by: "A Mind for Numbers" },
+  { id: "chunk", slots: ["exam", "empty"], title: "덩어리로 묶라", line: "공식과 예제를 따로 외우지 말고, ‘이런 조건이면 이 절차’처럼 한 덩어리로 묶으세요.", by: "A Mind for Numbers" },
+  { id: "inspect", slots: ["reading"], title: "먼저 훑고 질문을 만들어라", line: "처음부터 정독하지 마세요. 목차·머리말·결론을 훑고 ‘이 책은 무엇을 주장하는가’를 먼저 적으세요.", by: "How to Read a Book" },
+  { id: "outline", slots: ["reading", "ko"], title: "뼈대를 요구하라", line: "저자의 용어를 빌리고, 장 단위 뼈대를 자기 말로 다시 그리세요. 문장을 베끼는 건 읽기가 아닙니다.", by: "How to Read a Book" },
+  { id: "journal", slots: ["reading", "off"], title: "읽은 것을 적는 공책", line: "한 권을 천천히 읽고, 주장·반론·내 질문을 같은 공책에 남기세요. 속도보다 대화가 남습니다.", by: "The Well-Educated Mind" },
+  { id: "stages", slots: ["reading"], title: "세 번 다른 읽기", line: "무엇을 말하는가, 타당한가, 나와 무슨 상관인가. 같은 책을 이 세 층으로 나눠 읽으세요.", by: "The Well-Educated Mind" },
+  { id: "attend", slots: ["empty", "daily"], title: "주의가 없으면 기억도 없다", line: "동시에 여러 화면을 켜 두면 처음부터 저장이 안 됩니다. 한 가지에만 주의를 준 뒤 꺼내 보세요.", by: "Remember" },
+  { id: "meaning", slots: ["exam", "empty"], title: "의미 있게 붙이라", line: "의미와 감정이 붙은 기억이 오래갑니다. ‘왜 이게 중요한지’ 한 줄을 같이 적으세요.", by: "Remember" },
+  { id: "palace", slots: ["off", "empty"], title: "장소를 걸어라", line: "외울 목록은 익숙한 길 위의 장면에 붙이세요. 다만 이해 없는 암기 트릭으로 끝내지는 마세요.", by: "Moonwalking with Einstein" },
+  { id: "encode", slots: ["exam", "daily"], title: "생생하게 붙일수록 꺼내진다", line: "밋밋한 반복보다, 이상하고 구체적인 장면으로 바꿔 붙이면 시험장에서 더 잘 올라옵니다.", by: "Moonwalking with Einstein" },
 ];
 
 const CHIPS = [
-  "덮고 복원",
-  "동사로 잇기",
-  "개념 5~9",
-  "종류표",
-  "한 문장",
-  "질문으로",
-  "틀린 좌표",
-  "15분 루틴",
+  "덮고 인출",
   "간격 복습",
-  "관계 세 형제",
+  "섞어 풀기",
+  "잠이 복습",
+  "약한 곳만",
+  "시험처럼",
+  "한 덩어리",
+  "먼저 훑기",
+  "주의 하나",
+  "의미 한 줄",
 ];
 
 export function pickStudyTip(slot = "any", seed = Date.now()) {
@@ -49,9 +51,9 @@ export function studyChip(seed = 0) {
 
 export function studyWatermarkLines() {
   return [
-    "명사 사이를 동사로 잇는다",
-    "보면 아는 것과 꺼내는 것은 다르다",
-    "1차는 정리, 2차는 인출",
-    "오답은 지도를 고치는 좌표다",
+    "다시 읽지 말고 꺼내라 · Make It Stick",
+    "조금 잊은 뒤가 더 단단하다 · How We Learn",
+    "약한 지점만 고친다 · Peak",
+    "시험과 같은 방식으로 연습한다 · Ultralearning",
   ];
 }

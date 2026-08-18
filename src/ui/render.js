@@ -55,13 +55,13 @@ const VIEWS = [
 
 function studyLine(slot, seed) {
   const tip = pickStudyTip(slot, seed);
-  return `<p class="okh-study-line"><strong>${esc(tip.title)}</strong> ${esc(tip.line)}</p>`;
+  return `<p class="okh-study-line"><strong>${esc(tip.title)}</strong> ${esc(tip.line)} <em>${esc(tip.by || STUDY_SOURCE)}</em></p>`;
 }
 
 function studyCard(slot, seed) {
   const tip = pickStudyTip(slot, seed);
   return `<article class="okh-card okh-study-card">
-    <h3>${esc(STUDY_SOURCE)}</h3>
+    <h3>${esc(tip.by || STUDY_SOURCE)}</h3>
     <h2>${esc(tip.title)}</h2>
     <p class="okh-empty">${esc(tip.line)}</p>
   </article>`;
@@ -381,7 +381,12 @@ export function createHub(options = {}) {
           ${
             dishes.length
               ? `<ul class="okh-list">${dishes
-                  .map((d) => `<li>${esc(d.replace(/\(\d.*$/, ""))}${allergenNames(d).length ? ` <span class="okh-chip">${esc(allergenNames(d).join(", "))}</span>` : ""}</li>`)
+                  .map((d) => {
+                    const tags = allergenNames(d);
+                    return `<li class="okh-dish"><span class="okh-dish-name">${esc(d.replace(/\(\d.*$/, ""))}</span>${
+                      tags.length ? `<span class="okh-tags">${tags.map((n) => `<span class="okh-tag">${esc(n)}</span>`).join("")}</span>` : ""
+                    }</li>`;
+                  })
                   .join("")}</ul>`
               : `<p class="okh-empty">오늘 급식이 없습니다.</p>${studyLine("daily", Number(today) + 2)}`
           }
@@ -597,7 +602,7 @@ export function createHub(options = {}) {
     root.innerHTML =
       renderBar() +
       renderTabs() +
-      `<aside class="okh-study" data-okh="study"><strong>${esc(tip.title)}</strong> ${esc(tip.line)} <em>${esc(STUDY_SOURCE)}</em></aside>` +
+      `<aside class="okh-study" data-okh="study"><strong>${esc(tip.title)}</strong> ${esc(tip.line)} <em>${esc(tip.by || STUDY_SOURCE)}</em></aside>` +
       `<div class="okh-body"><div class="okh-wm" aria-hidden="true">${esc(wm)}</div>${state.error ? `<p class="okh-empty">NEIS: ${esc(state.error)}</p>` : ""}${views[state.view]()}</div>` +
       `<div class="okh-foot">리드마스터 · 출처 NEIS · ${esc(school.name)} · ${esc(studyChip(new Date().getDate()))}</div>`;
 
@@ -717,7 +722,7 @@ export function createHub(options = {}) {
         const st = root.querySelector("[data-okh=study]");
         if (st) {
           const tip = pickStudyTip("any", Date.now());
-          st.innerHTML = `<strong>${esc(tip.title)}</strong> ${esc(tip.line)} <em>${esc(STUDY_SOURCE)}</em>`;
+          st.innerHTML = `<strong>${esc(tip.title)}</strong> ${esc(tip.line)} <em>${esc(tip.by || STUDY_SOURCE)}</em>`;
         }
       }, 14000);
     }
